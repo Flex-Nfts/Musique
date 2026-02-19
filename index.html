@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SoundWave — Ultra Clean UI</title>
+<title>SoundWave — Visual Experience</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -45,20 +45,21 @@
     cursor: pointer; font-size: 12px; font-weight: 800; border: none; transition: 0.2s; width: 100%;
     text-transform: uppercase; letter-spacing: 1px;
   }
-  .import-badge-red:hover { background: #ff5e57; transform: translateY(-2px); }
 
   /* MAIN CONTENT */
   .main { overflow-y: auto; padding: 30px; }
   .view-title { font-family: 'Syne', sans-serif; font-size: 24px; margin-bottom: 25px; }
 
-  /* TRACK LIST (SUPPRESSION DES POINTS DE DURÉE) */
+  /* TRACK LIST AVEC IMAGES GÉNÉRÉES */
   .track-item { 
-    display: grid; grid-template-columns: 35px 1fr 100px; align-items: center; 
-    padding: 12px; border-radius: 12px; cursor: pointer; transition: 0.2s; margin-bottom: 2px;
+    display: grid; grid-template-columns: 35px 50px 1fr 100px; align-items: center; 
+    padding: 10px 12px; border-radius: 12px; cursor: pointer; transition: 0.2s; margin-bottom: 5px;
   }
   .track-item:hover { background: var(--bg-card); }
-  .track-item.playing { color: var(--accent); }
+  .track-item.playing { background: rgba(79, 110, 247, 0.1); color: var(--accent); }
   
+  .track-img { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; background: var(--bg-panel); }
+
   .track-actions { display: flex; gap: 15px; justify-content: flex-end; opacity: 0; }
   .track-item:hover .track-actions { opacity: 1; }
   
@@ -70,11 +71,12 @@
   .player { grid-column: 1 / 3; background: #08090d; border-top: 1px solid var(--border); display: flex; align-items: center; padding: 0 30px; justify-content: space-between; }
   .player-left-controls { display: flex; align-items: center; gap: 25px; width: 150px; }
   .btn-img-style { background: none; border: none; color: white; cursor: pointer; display: flex; align-items: center; }
-  .btn-img-style svg { width: 20px; height: 20px; fill: currentColor; }
+  .btn-img-style svg { width: 22px; height: 22px; fill: currentColor; }
 
   .player-center { flex: 1; display: flex; align-items: center; gap: 20px; padding: 0 40px; }
-  .mini-cover { width: 40px; height: 40px; border-radius: 6px; background: var(--bg-card); display:flex; align-items:center; justify-content:center; font-size:10px; }
-  .track-meta { min-width: 140px; }
+  .mini-cover-player { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border); }
+  
+  .track-meta { min-width: 140px; max-width: 200px; }
   .progress-container { flex: 1; display: flex; align-items: center; gap: 15px; }
   .time-stamp { font-size: 11px; color: var(--text-muted); min-width: 35px; }
   .progress-line-bg { flex: 1; height: 3px; background: #2a2d3a; border-radius: 2px; cursor: pointer; }
@@ -95,21 +97,18 @@
 <div class="app">
   <aside class="sidebar">
     <div class="section-label">Menu</div>
-    
     <div class="nav-item active" id="nav-playlist" onclick="showView('playlist')">
       <div class="nav-link">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
         Playlists
       </div>
     </div>
-
     <div class="nav-item" id="nav-favorite" onclick="showView('favorite')">
       <div class="nav-link">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         Favoris
       </div>
     </div>
-
     <button class="import-badge-red" onclick="toggleModal(true)">Import</button>
   </aside>
 
@@ -132,9 +131,9 @@
     </div>
 
     <div class="player-center">
-      <div class="mini-cover">RAI</div>
+      <img src="https://via.placeholder.com/45" class="mini-cover-player" id="npImage">
       <div class="track-meta">
-        <div id="npTitle" style="font-size: 13px; font-weight: 600;">Aucun titre</div>
+        <div id="npTitle" style="font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Aucun titre</div>
         <div id="npArtist" style="font-size: 11px; color: var(--text-secondary);">Prêt à l'écoute</div>
       </div>
       <div class="progress-container">
@@ -153,10 +152,10 @@
 
 <div class="modal" id="importModal">
   <div class="modal-content">
-    <h2 style="font-size:18px">Ajouter des musiques</h2>
-    <textarea id="importInput" placeholder="Titre | Artiste | Lien Dropbox"></textarea>
+    <h2 style="font-size:18px">Importer</h2>
+    <textarea id="importInput" placeholder="Titre | Artiste | Lien"></textarea>
     <div style="display:flex; justify-content:flex-end; gap:10px">
-      <button onclick="toggleModal(false)" style="background:none; border:none; color:white; cursor:pointer">Annuler</button>
+      <button onclick="toggleModal(false)" style="background:none; border:none; color:white; cursor:pointer">Fermer</button>
       <button onclick="processImport()" style="background:var(--import-red); border:none; color:white; padding:8px 20px; border-radius:8px; cursor:pointer; font-weight:700">IMPORT</button>
     </div>
   </div>
@@ -184,7 +183,11 @@
     input.split('\n').forEach(line => {
       if(line.includes('|')) {
         const [title, artist, url] = line.split('|').map(s => s.trim());
-        tracks.push({ title, artist, url });
+        // GÉNÉRATION D'UNE IMAGE ALÉATOIRE UNIQUE POUR CE TITRE
+        const randomID = Math.floor(Math.random() * 1000);
+        const coverUrl = `https://picsum.photos/seed/${randomID}/200`; 
+        
+        tracks.push({ title, artist, url, cover: coverUrl });
       }
     });
     render();
@@ -201,7 +204,8 @@
       return `
       <div class="track-item ${listType === 'main' && currentIdx === i ? 'playing' : ''}" onclick="playFromList('${listType}', ${i})">
         <div style="font-size:11px; color:var(--text-muted)">${String(i+1).padStart(2,'0')}</div>
-        <div style="overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">
+        <img src="${t.cover}" class="track-img">
+        <div style="overflow:hidden; white-space:nowrap; text-overflow:ellipsis; padding-left:10px;">
           ${t.title} <span style="font-size:11px; opacity:0.5; margin-left:8px">${t.artist}</span>
         </div>
         <div class="track-actions">
@@ -219,8 +223,11 @@
     const list = type === 'main' ? tracks : favorites;
     const t = list[i];
     currentIdx = tracks.findIndex(item => item.url === t.url);
+    
     document.getElementById('npTitle').innerText = t.title;
     document.getElementById('npArtist').innerText = t.artist;
+    document.getElementById('npImage').src = t.cover;
+    
     audio.src = t.url;
     audio.play();
     updatePlayIcon(true);
