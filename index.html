@@ -39,12 +39,19 @@
   .nav-item { 
     display: flex; align-items: center; padding: 10px 15px; border-radius: 10px; 
     cursor: pointer; color: var(--text-secondary); transition: all 0.3s ease; font-size: 14px; font-weight: 500;
-    margin-bottom: 2px;
+    margin-bottom: 2px; position: relative;
   }
   .nav-item:hover { color: var(--text-primary); background: var(--bg-hover); }
   .nav-item.active { background: var(--accent-gradient); color: white !important; box-shadow: 0 4px 15px rgba(79, 110, 247, 0.3); }
-  .nav-link { display: flex; align-items: center; gap: 12px; flex: 1; }
-  .nav-item svg { width: 18px; height: 18px; }
+  .nav-link { display: flex; align-items: center; gap: 12px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+  /* RENAME BUTTON IN NAV */
+  .btn-rename-nav { 
+    opacity: 0; font-size: 12px; margin-left: 5px; background: none; border: none; color: inherit; cursor: pointer; transition: 0.2s;
+  }
+  .nav-item:hover .btn-rename-nav { opacity: 0.6; }
+  .btn-rename-nav:hover { opacity: 1 !important; transform: scale(1.2); }
 
   /* PURPLE BADGES */
   .btn-purple { 
@@ -135,7 +142,7 @@
       <div class="section-label">Mes Playlists</div>
       <div class="playlist-controls">
         <button class="btn-purple" title="Nouvelle Playlist" onclick="createPlaylist()">+</button>
-        <button class="btn-purple" title="Supprimer Playlist" onclick="deleteCurrentPlaylist()">-</button>
+        <button class="btn-purple" title="Supprimer Playlist Actuelle" onclick="deleteCurrentPlaylist()">-</button>
       </div>
     </div>
     <div id="custom-playlists-nav"></div>
@@ -196,20 +203,40 @@
 <script>
   let tracks = [];
   let favorites = [];
-  let customPlaylists = {}; // { "Nom": [trackObj, trackObj] }
+  let customPlaylists = {}; 
   let currentView = 'all'; 
   let currentIdx = -1;
   const audio = document.getElementById('mainAudio');
 
   function toggleModal(show) { document.getElementById('importModal').classList.toggle('open', show); }
 
-  // GESTION DES PLAYLISTS PERSO
+  // GESTION DES PLAYLISTS
   function createPlaylist() {
     const name = prompt("Nom de la nouvelle playlist :");
     if(name && !customPlaylists[name]) {
       customPlaylists[name] = [];
       renderPlaylistsNav();
       showView(name);
+    }
+  }
+
+  function renamePlaylist(e, oldName) {
+    e.stopPropagation();
+    const newName = prompt(`Renommer la playlist "${oldName}" en :`, oldName);
+    if(newName && newName !== oldName) {
+      if(customPlaylists[newName]) {
+        alert("Ce nom existe déjà !");
+        return;
+      }
+      // Transférer les données vers la nouvelle clé
+      customPlaylists[newName] = customPlaylists[oldName];
+      delete customPlaylists[oldName];
+      
+      // Si on était sur cette vue, on met à jour le titre
+      if(currentView === oldName) currentView = newName;
+      
+      renderPlaylistsNav();
+      showView(currentView);
     }
   }
 
@@ -231,8 +258,9 @@
       <div class="nav-item" id="nav-${name}" onclick="showView('${name}')">
         <div class="nav-link">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19V5a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2zM7 7h10M7 12h10M7 17h10"/></svg>
-          ${name}
+          <span style="overflow:hidden; text-overflow:ellipsis;">${name}</span>
         </div>
+        <button class="btn-rename-nav" onclick="renamePlaylist(event, '${name}')" title="Renommer">✎</button>
       </div>
     `).join('');
   }
@@ -254,12 +282,22 @@
 
   function addToCustom(e, trackIndex) {
     e.stopPropagation();
-    if(currentView === 'all' || currentView === 'favorite') {
-      const pName = prompt("Vers quelle playlist ? (" + Object.keys(customPlaylists).join(', ') + ")");
-      if(customPlaylists[pName]) {
-        customPlaylists[pName].push(tracks[trackIndex]);
-        alert("Ajouté à " + pName);
+    const playlistNames = Object.keys(customPlaylists);
+    if(playlistNames.length === 0) {
+      alert("Créez d'abord une playlist avec le bouton + violet.");
+      return;
+    }
+    const pName = prompt("Vers quelle playlist ? (" + playlistNames.join(', ') + ")");
+    if(customPlaylists[pName]) {
+      // Éviter les doublons dans la même playlist
+      if(customPlaylists[pName].some(t => t.url === tracks[trackIndex].url)) {
+        alert("Déjà présent dans cette playlist.");
+        return;
       }
+      customPlaylists[pName].push(tracks[trackIndex]);
+      alert("Ajouté à " + pName);
+    } else if (pName !== null) {
+      alert("Playlist inexistante.");
     }
   }
 
@@ -268,7 +306,7 @@
     const data = JSON.stringify({ tracks, favorites, customPlaylists }, null, 2);
     const blob = new Blob([data], { type: "application/json" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = "soundwave_full_backup.json"; a.click();
+    const a = document.createElement('a'); a.href = url; a.download = "soundwave_save.json"; a.click();
   }
 
   function importBackup(event) {
@@ -282,7 +320,7 @@
         favorites = json.favorites || [];
         customPlaylists = json.customPlaylists || {};
         renderPlaylistsNav();
-        render();
+        showView('all');
       } catch(err) { alert("Erreur de fichier"); }
     };
     reader.readAsText(file);
@@ -328,6 +366,7 @@
 
   function playFromCurrentView(i) {
     let list = (currentView === 'all') ? tracks : (currentView === 'favorite' ? favorites : customPlaylists[currentView]);
+    if(!list[i]) return;
     const t = list[i];
     currentIdx = i;
     document.getElementById('npTitle').innerText = t.title;
@@ -345,7 +384,11 @@
     document.getElementById('playIcon').innerHTML = playing ? '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>' : '<path d="M8 5v14l11-7z"/>';
   }
 
-  function nextTrack() { if(currentIdx < tracks.length - 1) playFromCurrentView(currentIdx + 1); }
+  function nextTrack() {
+    let list = (currentView === 'all') ? tracks : (currentView === 'favorite' ? favorites : customPlaylists[currentView]);
+    if(currentIdx < list.length - 1) playFromCurrentView(currentIdx + 1); 
+  }
+  
   function prevTrack() { if(currentIdx > 0) playFromCurrentView(currentIdx - 1); }
 
   function toggleFav(e, i) {
@@ -359,7 +402,13 @@
 
   function deleteTrack(e, i) {
     e.stopPropagation();
-    if(currentView === 'all') tracks.splice(i, 1);
+    if(currentView === 'all') {
+      const removed = tracks.splice(i, 1)[0];
+      favorites = favorites.filter(f => f.url !== removed.url);
+      for(let p in customPlaylists) {
+        customPlaylists[p] = customPlaylists[p].filter(f => f.url !== removed.url);
+      }
+    }
     else if(currentView === 'favorite') favorites.splice(i, 1);
     else customPlaylists[currentView].splice(i, 1);
     render();
