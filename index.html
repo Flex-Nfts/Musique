@@ -3,97 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SoundVault Cloud</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <title>SoundVault Cloud v2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #000000;
-            --bg-card: #121212;
+            --sidebar: #121212;
             --spotify-green: #1DB954;
-            --text: #ffffff;
-            --text-mid: #b3b3b3;
-            --grad: linear-gradient(180deg, #222222 0%, #000000 100%);
+            --card-hover: #282828;
+            --text-main: #ffffff;
+            --text-dim: #b3b3b3;
         }
-        
+
         body, html {
             margin: 0; padding: 0; height: 100%;
             font-family: 'Nunito', sans-serif;
             background-color: var(--bg);
-            color: var(--text);
+            color: var(--text-main);
             overflow: hidden;
         }
 
         .shell {
             display: grid;
-            grid-template-columns: 350px 1fr;
+            grid-template-columns: 380px 1fr;
             height: 100vh;
         }
 
-        /* --- SIDEBAR (PLAYER) --- */
+        /* --- PANNEAU GAUCHE (LECTEUR) --- */
         .left {
-            background: var(--grad);
-            border-right: 1px solid #282828;
+            background: linear-gradient(180deg, #222222 0%, #000000 100%);
+            padding: 30px;
             display: flex;
             flex-direction: column;
-            padding: 20px;
             align-items: center;
+            border-right: 1px solid #282828;
             text-align: center;
         }
 
         .cover-art {
-            width: 280px; height: 280px;
+            width: 300px; height: 300px;
             background: #282828;
-            border-radius: 8px;
-            margin: 40px 0;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
             display: flex; align-items: center; justify-content: center;
-            font-size: 80px; overflow: hidden;
+            font-size: 100px; overflow: hidden;
         }
         .cover-art img { width: 100%; height: 100%; object-fit: cover; }
 
-        .controls { width: 100%; }
-        .prog-bar {
-            width: 100%; height: 4px; background: #4f4f4f;
-            border-radius: 2px; margin: 20px 0; cursor: pointer;
-        }
-        .prog-fill { height: 100%; background: var(--text); border-radius: 2px; width: 0%; }
+        .track-info h2 { margin: 10px 0 5px 0; font-size: 24px; }
+        .track-info p { color: var(--text-dim); margin: 0; }
 
-        .btn-play {
-            background: #fff; border: none; width: 56px; height: 56px;
+        .player-controls { width: 100%; margin-top: auto; padding-bottom: 20px; }
+        .prog-container {
+            width: 100%; height: 5px; background: #4f4f4f;
+            border-radius: 10px; margin: 20px 0; cursor: pointer;
+        }
+        .prog-bar { height: 100%; background: var(--spotify-green); border-radius: 10px; width: 0%; }
+
+        .play-btn {
+            background: white; border: none; width: 60px; height: 60px;
             border-radius: 50%; font-size: 24px; cursor: pointer;
             transition: transform 0.2s;
         }
-        .btn-play:hover { transform: scale(1.05); }
+        .play-btn:hover { transform: scale(1.1); }
 
-        /* --- MAIN CONTENT --- */
+        /* --- PANNEAU DROIT (BIBLIOTHÈQUE) --- */
         .right {
-            padding: 20px;
+            padding: 30px;
             overflow-y: auto;
-            background: linear-gradient(180deg, #1e1e1e 0%, #121212 100%);
+            background: #121212;
         }
 
-        .track-row {
+        .import-section {
+            background: #181818;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        textarea {
+            width: 100%; height: 100px;
+            background: #282828; border: 1px solid #3e3e3e;
+            color: white; border-radius: 6px; padding: 12px;
+            font-family: monospace; resize: none; margin-top: 10px;
+            box-sizing: border-box;
+        }
+
+        .btn-bulk {
+            background: var(--spotify-green); color: black;
+            border: none; padding: 12px 24px; border-radius: 30px;
+            font-weight: bold; cursor: pointer; margin-top: 15px;
+            transition: opacity 0.2s;
+        }
+        .btn-bulk:hover { opacity: 0.9; }
+
+        .playlist-header {
             display: grid;
-            grid-template-columns: 50px 1fr 1fr 50px;
-            padding: 10px;
-            border-radius: 5px;
+            grid-template-columns: 50px 2fr 1fr 80px;
+            border-bottom: 1px solid #282828;
+            padding-bottom: 10px; color: var(--text-dim);
+            font-size: 14px; text-transform: uppercase;
+        }
+
+        .track-item {
+            display: grid;
+            grid-template-columns: 50px 2fr 1fr 80px;
+            padding: 12px 0;
+            border-radius: 6px;
             align-items: center;
             cursor: pointer;
+            transition: background 0.2s;
         }
-        .track-row:hover { background: rgba(255,255,255,0.1); }
-        .track-row.active { color: var(--spotify-green); }
+        .track-item:hover { background: var(--card-hover); }
+        .track-item.playing { color: var(--spotify-green); }
 
-        .input-group {
-            background: #282828; padding: 15px; border-radius: 8px; margin-bottom: 20px;
-        }
-        input {
-            background: #3e3e3e; border: none; color: white;
-            padding: 8px; border-radius: 4px; margin-right: 10px;
-        }
-        button.add {
-            background: var(--spotify-green); color: black;
-            border: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor: pointer;
-        }
+        .delete-btn { color: #ff4444; border: none; background: none; cursor: pointer; font-size: 18px; }
     </style>
 </head>
 <body>
@@ -101,79 +126,101 @@
 <div class="shell">
     <div class="left">
         <div class="cover-art" id="mainCover">♫</div>
-        <h2 id="curTitle">Titre de la musique</h2>
-        <p id="curArtist" style="color: var(--text-mid)">Artiste</p>
+        <div class="track-info">
+            <h2 id="curTitle">Prêt à écouter ?</h2>
+            <p id="curArtist">Sélectionnez une musique</p>
+        </div>
         
-        <div class="controls">
-            <div class="prog-bar" onclick="seek(event)">
-                <div class="prog-fill" id="progFill"></div>
+        <div class="player-controls">
+            <div class="prog-container" onclick="seek(event)">
+                <div class="prog-bar" id="progBar"></div>
             </div>
-            <button class="btn-play" onclick="togglePlay()" id="playBtn">▶</button>
+            <button class="play-btn" onclick="togglePlay()" id="playBtn">▶</button>
         </div>
     </div>
 
     <div class="right">
-        <h1>Ma Bibliothèque Cloud</h1>
-        
-        <div class="input-group">
-            <input type="text" id="inTitle" placeholder="Titre">
-            <input type="text" id="inArtist" placeholder="Artiste">
-            <input type="text" id="inUrl" placeholder="URL Google Drive (Lien direct)">
-            <button class="add" onclick="addNewTrack()">Ajouter à ma liste</button>
+        <h1>Ma Musique Privée</h1>
+
+        <div class="import-section">
+            <label><strong>Importation rapide</strong> (Format : Titre | Artiste | URL Dropbox)</label>
+            <textarea id="bulkInput" placeholder="Exemple :&#10;Ma Musique | Artiste | https://www.dropbox.com/s/xyz/song.mp3?raw=1"></textarea>
+            <button class="btn-bulk" onclick="addBulkTracks()">Importer la liste</button>
         </div>
 
-        <div id="playlistContainer">
-            </div>
+        <div class="playlist-header">
+            <span>#</span><span>Titre</span><span>Artiste</span><span>Action</span>
+        </div>
+        <div id="listContainer"></div>
     </div>
 </div>
 
 <script>
-    let playlist = JSON.parse(localStorage.getItem('myCloudMusic')) || [];
+    let playlist = JSON.parse(localStorage.getItem('cloud_v2_list')) || [];
     let audio = new Audio();
     let isPlaying = false;
+    let currentIndex = -1;
 
-    // Fonction pour ajouter une musique
-    function addNewTrack() {
-        const title = document.getElementById('inTitle').value;
-        const artist = document.getElementById('inArtist').value;
-        let url = document.getElementById('inUrl').value;
+    // FONCTION MAGIQUE : AJOUTER TOUTE UNE LISTE
+    function addBulkTracks() {
+        const text = document.getElementById('bulkInput').value;
+        const lines = text.split('\n');
+        let count = 0;
 
-        if(!title || !url) return alert("Titre et URL requis !");
+        lines.forEach(line => {
+            if(line.trim() !== "") {
+                let [title, artist, url] = line.split('|').map(item => item.trim());
+                
+                if(title && url) {
+                    // Correction automatique Dropbox
+                    if(url.includes('dropbox.com')) {
+                        url = url.replace('dl=0', 'raw=1').replace('www.dropbox.com', 'dl.dropboxusercontent.com');
+                    }
+                    playlist.push({ title, artist: artist || "Inconnu", url });
+                    count++;
+                }
+            }
+        });
 
-        // Conversion lien Google Drive si nécessaire
-        if(url.includes('drive.google.com')) {
-            const fileId = url.split('/d/')[1].split('/')[0];
-            url = `https://drive.google.com/uc?export=download&id=${fileId}`;
+        if(count > 0) {
+            saveAndRender();
+            document.getElementById('bulkInput').value = "";
+            alert(count + " musiques ajoutées avec succès !");
         }
+    }
 
-        playlist.push({ title, artist, url });
-        localStorage.setItem('myCloudMusic', JSON.stringify(playlist));
+    function saveAndRender() {
+        localStorage.setItem('cloud_v2_list', JSON.stringify(playlist));
         render();
     }
 
     function render() {
-        const container = document.getElementById('playlistContainer');
+        const container = document.getElementById('listContainer');
         container.innerHTML = playlist.map((t, i) => `
-            <div class="track-row" onclick="playTrack(${i})">
-                <span>${i + 1}</span>
-                <span><b>${t.title}</b></span>
-                <span>${t.artist}</span>
-                <span onclick="deleteTrack(event, ${i})">🗑</span>
+            <div class="track-item ${currentIndex === i ? 'playing' : ''}" onclick="playTrack(${i})">
+                <span style="color: var(--text-dim)">${i + 1}</span>
+                <span><strong>${t.title}</strong></span>
+                <span style="color: var(--text-dim)">${t.artist}</span>
+                <button class="delete-btn" onclick="deleteTrack(event, ${i})">×</button>
             </div>
         `).join('');
     }
 
     function playTrack(i) {
+        currentIndex = i;
         const t = playlist[i];
         document.getElementById('curTitle').innerText = t.title;
         document.getElementById('curArtist').innerText = t.artist;
+        
         audio.src = t.url;
         audio.play();
         isPlaying = true;
         document.getElementById('playBtn').innerText = '⏸';
+        render();
     }
 
     function togglePlay() {
+        if(!audio.src && playlist.length > 0) return playTrack(0);
         if(isPlaying) { audio.pause(); document.getElementById('playBtn').innerText = '▶'; }
         else { audio.play(); document.getElementById('playBtn').innerText = '⏸'; }
         isPlaying = !isPlaying;
@@ -182,13 +229,28 @@
     function deleteTrack(e, i) {
         e.stopPropagation();
         playlist.splice(i, 1);
-        localStorage.setItem('myCloudMusic', JSON.stringify(playlist));
-        render();
+        saveAndRender();
+    }
+
+    function seek(e) {
+        if(!audio.duration) return;
+        const container = e.currentTarget;
+        const rect = container.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const pct = x / rect.width;
+        audio.currentTime = pct * audio.duration;
     }
 
     audio.ontimeupdate = () => {
-        const pct = (audio.currentTime / audio.duration) * 100;
-        document.getElementById('progFill').style.width = pct + '%';
+        if(audio.duration) {
+            const pct = (audio.currentTime / audio.duration) * 100;
+            document.getElementById('progBar').style.width = pct + '%';
+        }
+    };
+
+    // Lecture automatique de la suivante
+    audio.onended = () => {
+        if(currentIndex + 1 < playlist.length) playTrack(currentIndex + 1);
     };
 
     render();
