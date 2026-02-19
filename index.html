@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>SoundWave — Multi-Device</title>
+<title>SoundWave — Mobile Ready</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -15,12 +15,13 @@
     --accent-gradient: linear-gradient(90deg, #4f6ef7, #7c94f0);
     --import-red: #eb4d4b;
     --save-green: #27ae60;
+    --save-hover: #2ecc71;
     --playlist-purple: #8e44ad;
     --text-primary: #e8eaf2;
     --text-secondary: #6b7394;
     --text-muted: #3d4260;
     --border: rgba(255,255,255,0.05);
-    --sidebar-w: 260px;
+    --sidebar-w: 240px;
     --player-h: 90px;
   }
 
@@ -33,10 +34,9 @@
     grid-template-columns: var(--sidebar-w) 1fr; 
     grid-template-rows: 1fr var(--player-h); 
     height: 100vh; 
-    transition: all 0.3s ease;
   }
 
-  /* SIDEBAR RESPONSIVE */
+  /* SIDEBAR */
   .sidebar { 
     background: var(--bg-panel); 
     border-right: 1px solid var(--border); 
@@ -44,184 +44,149 @@
     display: flex; 
     flex-direction: column; 
     gap: 8px; 
-    z-index: 100;
+    overflow-y: auto;
   }
-
-  .mobile-header { display: none; padding: 15px; background: var(--bg-panel); border-bottom: 1px solid var(--border); align-items: center; justify-content: space-between; }
-
-  /* TABLETTE & MOBILE (< 900px) */
-  @media (max-width: 900px) {
-    .app { grid-template-columns: 1fr; }
-    .sidebar { 
-      position: fixed; 
-      left: -100%; 
-      top: 0; 
-      bottom: var(--player-h); 
-      width: 280px; 
-      transition: 0.3s ease; 
-    }
-    .sidebar.open { left: 0; box-shadow: 20px 0 50px rgba(0,0,0,0.5); }
-    .mobile-header { display: flex; }
-    .main { padding: 15px !important; }
-  }
-
-  /* CONTENUS */
+  
   .section-header { display: flex; align-items: center; justify-content: space-between; margin: 15px 8px 5px 8px; }
   .section-label { font-family: 'Syne', sans-serif; font-size: 10px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; }
   
   .nav-item { 
     display: flex; align-items: center; padding: 12px 15px; border-radius: 10px; 
-    cursor: pointer; color: var(--text-secondary); transition: 0.2s; font-size: 14px;
+    cursor: pointer; color: var(--text-secondary); transition: 0.2s; font-size: 14px; 
+    margin-bottom: 2px;
   }
   .nav-item.active { background: var(--accent-gradient); color: white; }
   .nav-link { display: flex; align-items: center; gap: 12px; flex: 1; overflow: hidden; }
-  .nav-item svg { width: 18px; flex-shrink: 0; }
-
-  .btn-rename-nav { opacity: 0.5; font-size: 12px; background: none; border: none; color: inherit; cursor: pointer; padding: 5px; }
+  .nav-item svg { width: 20px; height: 20px; flex-shrink: 0; }
 
   /* BOUTONS ACTIONS */
-  .btn-purple { background: var(--playlist-purple); color: white; border: none; border-radius: 5px; width: 24px; height: 24px; cursor: pointer; }
+  .btn-purple { background: var(--playlist-purple); color: white; border: none; border-radius: 6px; width: 24px; height: 24px; cursor: pointer; font-weight: bold; }
   .save-controls { display: flex; gap: 8px; margin-top: auto; padding-top: 20px; }
-  .badge-green { background: var(--save-green); color: white; border: none; border-radius: 8px; padding: 10px; cursor: pointer; font-size: 12px; font-weight: 800; flex: 1; }
-  .btn-load-file { width: 45px; }
-  .import-badge-red { background: var(--import-red); color: white; border: none; border-radius: 8px; padding: 12px; cursor: pointer; font-weight: 800; margin-top: 8px; }
+  .badge-green { background: var(--save-green); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: 800; text-transform: uppercase; flex: 1; padding: 12px; }
+  .import-badge-red { padding: 12px; background: var(--import-red); color: white; border-radius: 8px; border: none; width: 100%; margin-top: 8px; font-weight: 800; font-size: 11px; text-transform: uppercase; }
 
-  /* LISTE DE LECTURE */
-  .main { overflow-y: auto; padding: 30px; }
-  .view-title { font-family: 'Syne', sans-serif; font-size: clamp(20px, 5vw, 28px); margin-bottom: 20px; }
+  /* MAIN CONTENT */
+  .main { overflow-y: auto; padding: 20px; padding-bottom: 120px; }
+  .view-title { font-family: 'Syne', sans-serif; font-size: 22px; margin-bottom: 20px; }
 
+  /* LISTE DES PISTES */
   .track-item { 
     display: grid; 
-    grid-template-columns: 40px 50px 1fr 80px; 
+    grid-template-columns: 50px 1fr 80px; 
     align-items: center; 
     padding: 10px; 
     border-radius: 12px; 
     margin-bottom: 8px;
-    cursor: pointer;
+    background: rgba(255,255,255,0.02);
   }
-  .track-item:hover { background: var(--bg-card); }
-  .track-img { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; }
-  .track-info { padding: 0 10px; overflow: hidden; }
+  .track-img { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; }
+  .track-info { padding-left: 12px; overflow: hidden; }
   .track-info div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .track-actions { display: flex; justify-content: flex-end; gap: 10px; }
+  .track-actions { display: flex; gap: 15px; justify-content: flex-end; }
 
-  /* PLAYER BAR RESPONSIVE */
+  /* PLAYER BAR */
   .player { 
     grid-column: 1 / 3; 
     background: #08090d; 
     border-top: 1px solid var(--border); 
-    display: grid; 
-    grid-template-columns: 1fr 2fr 1fr;
+    display: flex; 
     align-items: center; 
-    padding: 0 20px; 
+    padding: 0 20px;
+    gap: 15px;
+    z-index: 10;
   }
-
-  @media (max-width: 600px) {
-    .player { grid-template-columns: 1fr 1fr; padding: 10px; }
-    .player-right { display: none !important; }
-    .progress-container { position: absolute; top: -2px; left: 0; width: 100%; padding: 0 !important; }
-    .time-stamp { display: none; }
-    .track-meta { max-width: 120px; }
-  }
-
-  .player-center { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-  .controls-row { display: flex; align-items: center; gap: 20px; }
-  .progress-container { width: 100%; display: flex; align-items: center; gap: 10px; }
-  .progress-line-bg { flex: 1; height: 4px; background: #222; border-radius: 2px; position: relative; cursor: pointer; }
+  .player-center { flex: 1; display: flex; align-items: center; gap: 12px; overflow: hidden; }
+  .progress-container { flex: 1; display: flex; align-items: center; gap: 10px; }
+  .progress-line-bg { flex: 1; height: 4px; background: #2a2d3a; border-radius: 2px; position: relative; }
   .progress-line-fill { height: 100%; background: var(--accent); width: 0%; border-radius: 2px; }
 
-  .btn-player { background: none; border: none; color: white; cursor: pointer; }
-  .btn-player svg { width: 28px; height: 28px; fill: currentColor; }
+  /* MOBILE RESPONSIVE QUERIES */
+  @media (max-width: 768px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar { 
+        position: fixed; bottom: 0; left: 0; width: 100%; height: 60px; 
+        flex-direction: row; padding: 5px; z-index: 100; border-right: none; border-top: 1px solid var(--border);
+        overflow-y: hidden; justify-content: space-around;
+    }
+    .section-label, .section-header, .save-controls, .import-badge-red, #custom-playlists-nav { display: none; }
+    
+    .main { padding: 15px; }
+    .player { grid-column: 1 / 2; bottom: 60px; height: 80px; position: fixed; width: 100%; }
+    .player-right { display: none; } /* On cache le volume sur mobile */
+    
+    .nav-item { padding: 8px; flex-direction: column; font-size: 10px; gap: 4px; flex: 1; }
+    .nav-item svg { width: 22px; height: 22px; }
+    .nav-link { flex-direction: column; gap: 2px; }
+  }
 
   /* MODAL */
-  .modal-content { background: var(--bg-panel); padding: 20px; border-radius: 15px; width: 90%; max-width: 400px; }
-  textarea { width: 100%; height: 120px; background: #000; border: 1px solid var(--border); color: #fff; border-radius: 8px; padding: 10px; margin: 15px 0; }
+  .modal-content { width: 90% !important; max-width: 450px; }
 </style>
 </head>
 <body>
 
-<div class="mobile-header">
-  <button onclick="toggleSidebar()" style="background:none; border:none; color:white;">
-    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
-  </button>
-  <div style="font-family:'Syne'; font-weight:800; font-size:18px;">SOUNDWAVE</div>
-  <div style="width:24px;"></div>
-</div>
-
 <div class="app">
-  <aside class="sidebar" id="sidebar">
+  <aside class="sidebar">
     <div class="section-label">Menu</div>
     <div class="nav-item active" id="nav-all" onclick="showView('all')">
       <div class="nav-link">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-        Bibliothèque
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        <span>Library</span>
       </div>
     </div>
     <div class="nav-item" id="nav-favorite" onclick="showView('favorite')">
       <div class="nav-link">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-        Favoris
+        <span>Favoris</span>
       </div>
     </div>
 
     <div class="section-header">
-      <div class="section-label">Mes Playlists</div>
-      <div style="display:flex; gap:5px;">
+      <div class="section-label">Playlists</div>
+      <div class="playlist-controls">
         <button class="btn-purple" onclick="createPlaylist()">+</button>
-        <button class="btn-purple" onclick="deleteCurrentPlaylist()">-</button>
       </div>
     </div>
-    <div id="custom-playlists-nav" style="flex:1; overflow-y:auto;"></div>
+    <div id="custom-playlists-nav"></div>
 
     <div class="save-controls">
-      <button class="badge-green" onclick="exportBackup()">SAVE</button>
-      <button class="badge-green btn-load-file" onclick="document.getElementById('fileInput').click()">📁</button>
+      <button class="badge-green" onclick="exportBackup()">Save</button>
+      <button class="badge-green" style="background:#555; max-width:50px" onclick="document.getElementById('fileInput').click()">+</button>
     </div>
     <input type="file" id="fileInput" style="display:none" accept=".json" onchange="importBackup(event)">
-    <button class="import-badge-red" onclick="toggleModal(true)">IMPORT MANUEL</button>
+    <button class="import-badge-red" onclick="toggleModal(true)">Import Manuel</button>
   </aside>
 
-  <main class="main" onclick="closeSidebarMobile()">
-    <h1 class="view-title" id="mainTitle">Bibliothèque</h1>
-    <div id="trackList"></div>
+  <main class="main">
+    <h1 class="view-title" id="mainTitle">Ma Musique</h1>
+    <div class="track-list" id="trackList"></div>
   </main>
 
   <footer class="player">
-    <div style="display:flex; align-items:center; gap:10px; overflow:hidden;">
-      <img src="" id="npImage" class="mini-cover-player" style="width:45px; height:45px; border-radius:5px; background:#222;">
-      <div class="track-meta" style="overflow:hidden;">
-        <div id="npTitle" style="font-size:13px; font-weight:600; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">Prêt à lire</div>
-        <div id="npArtist" style="font-size:11px; color:var(--text-secondary);">Sélectionnez un titre</div>
-      </div>
-    </div>
-
     <div class="player-center">
-      <div class="controls-row">
-        <button class="btn-player" onclick="prevTrack()"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
-        <button class="btn-player" onclick="togglePlay()"><svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
-        <button class="btn-player" onclick="nextTrack()"><svg viewBox="0 0 24 24"><path d="M16 6h2v12h-2zm-10.5 0v12l8.5-6z"/></svg></button>
-      </div>
-      <div class="progress-container">
-        <span class="time-stamp" id="curTime">0:00</span>
-        <div class="progress-line-bg" id="pBar" onclick="seek(event)"><div class="progress-line-fill" id="progressFill"></div></div>
-        <span class="time-stamp" id="totTime">0:00</span>
+      <img src="https://via.placeholder.com/45" class="mini-cover-player" id="npImage">
+      <div class="track-info" style="flex: 1;">
+        <div id="npTitle" style="font-size: 13px; font-weight: 600;">Aucun titre</div>
+        <div class="progress-container">
+            <div class="progress-line-bg" onclick="seek(event)"><div class="progress-line-fill" id="progressFill"></div></div>
+        </div>
       </div>
     </div>
-
-    <div class="player-right" style="display:flex; align-items:center; gap:10px; justify-content:flex-end;">
-      <svg width="16" height="16" fill="white" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
-      <input type="range" min="0" max="1" step="0.01" value="0.8" style="width:80px;" oninput="audio.volume = this.value">
+    <div class="player-actions">
+        <button class="btn-img-style" onclick="togglePlay()" style="background:var(--accent); border:none; border-radius:50%; width:45px; height:45px; color:white; display:flex; align-items:center; justify-content:center;">
+            <svg id="playIcon" viewBox="0 0 24 24" width="24" height="24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+        </button>
     </div>
   </footer>
 </div>
 
 <div class="modal" id="importModal">
   <div class="modal-content">
-    <h2 style="margin-bottom:10px;">Ajouter Musique</h2>
+    <h2 style="font-size:18px">Ajouter un titre</h2>
     <textarea id="importInput" placeholder="Titre | Artiste | Lien URL"></textarea>
-    <div style="display:flex; justify-content:flex-end; gap:10px;">
-      <button onclick="toggleModal(false)" style="color:#aaa; background:none; border:none; cursor:pointer;">Annuler</button>
-      <button onclick="processImport()" style="background:var(--accent); color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer;">Ajouter</button>
+    <div style="display:flex; justify-content:flex-end; gap:10px">
+      <button onclick="toggleModal(false)" style="color:white; background:none; border:none;">Annuler</button>
+      <button onclick="processImport()" style="background:var(--accent); color:white; padding:10px 20px; border-radius:8px; border:none; font-weight:bold;">AJOUTER</button>
     </div>
   </div>
 </div>
@@ -236,158 +201,125 @@
   let currentIdx = -1;
   const audio = document.getElementById('mainAudio');
 
-  // FONCTIONS INTERFACE
-  function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
-  function closeSidebarMobile() { if(window.innerWidth < 900) document.getElementById('sidebar').classList.remove('open'); }
-  function toggleModal(s) { document.getElementById('importModal').classList.toggle('open', s); }
+  function toggleModal(show) { document.getElementById('importModal').classList.toggle('open', show); }
 
-  // GESTION PLAYLISTS
   function createPlaylist() {
     const name = prompt("Nom de la playlist :");
     if(name && !customPlaylists[name]) {
       customPlaylists[name] = [];
       renderPlaylistsNav();
-    }
-  }
-
-  function renamePlaylist(e, oldName) {
-    e.stopPropagation();
-    const newName = prompt("Nouveau nom :", oldName);
-    if(newName && newName !== oldName && !customPlaylists[newName]) {
-      customPlaylists[newName] = customPlaylists[oldName];
-      delete customPlaylists[oldName];
-      if(currentView === oldName) currentView = newName;
-      renderPlaylistsNav();
-      showView(currentView);
-    }
-  }
-
-  function deleteCurrentPlaylist() {
-    if(currentView !== 'all' && currentView !== 'favorite' && confirm("Supprimer ?")) {
-      delete customPlaylists[currentView];
-      renderPlaylistsNav();
-      showView('all');
+      showView(name);
     }
   }
 
   function renderPlaylistsNav() {
     const nav = document.getElementById('custom-playlists-nav');
     nav.innerHTML = Object.keys(customPlaylists).map(name => `
-      <div class="nav-item ${currentView === name ? 'active' : ''}" onclick="showView('${name}')">
+      <div class="nav-item" id="nav-${name}" onclick="showView('${name}')">
         <div class="nav-link"><span>${name}</span></div>
-        <button class="btn-rename-nav" onclick="renamePlaylist(event, '${name}')">✎</button>
+        <button class="btn-rename-nav" onclick="renamePlaylist(event, '${name}')" style="background:none; border:none; color:gray">✎</button>
       </div>
     `).join('');
   }
 
-  function showView(v) {
-    currentView = v;
-    closeSidebarMobile();
-    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-    const activeNav = document.getElementById('nav-' + v) || [...document.querySelectorAll('.nav-item')].find(el => el.innerText.includes(v));
-    if(activeNav) activeNav.classList.add('active');
-    document.getElementById('mainTitle').innerText = v === 'all' ? 'Bibliothèque' : (v === 'favorite' ? 'Favoris' : v);
+  function showView(view) {
+    currentView = view;
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    if(document.getElementById('nav-' + view)) document.getElementById('nav-' + view).classList.add('active');
+    document.getElementById('mainTitle').innerText = view === 'all' ? "Bibliothèque" : (view === 'favorite' ? "Favoris" : view);
     render();
   }
 
-  // LOGIQUE AUDIO & TRACKS
+  function exportBackup() {
+    const data = JSON.stringify({ tracks, favorites, customPlaylists });
+    const blob = new Blob([data], { type: "application/json" });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = "music_backup.json";
+    a.click();
+  }
+
+  function importBackup(event) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const json = JSON.parse(e.target.result);
+      tracks = json.tracks || [];
+      favorites = json.favorites || [];
+      customPlaylists = json.customPlaylists || {};
+      renderPlaylistsNav(); render();
+    };
+    reader.readAsText(event.target.files[0]);
+  }
+
   function processImport() {
-    const val = document.getElementById('importInput').value;
-    val.split('\n').forEach(line => {
+    const input = document.getElementById('importInput').value;
+    input.split('\n').forEach(line => {
       if(line.includes('|')) {
-        const [t, a, u] = line.split('|').map(s => s.trim());
-        tracks.push({ title: t, artist: a, url: u, cover: `https://picsum.photos/seed/${Math.random()}/200` });
+        const [title, artist, url] = line.split('|').map(s => s.trim());
+        tracks.push({ title, artist, url, cover: `https://picsum.photos/seed/${Math.random()}/200` });
       }
     });
-    render(); toggleModal(false); document.getElementById('importInput').value = "";
+    render(); toggleModal(false);
   }
 
   function render() {
-    const container = document.getElementById('trackList');
-    let list = currentView === 'all' ? tracks : (currentView === 'favorite' ? favorites : customPlaylists[currentView] || []);
-    
-    container.innerHTML = list.map((t, i) => {
-      const isFav = favorites.some(f => f.url === t.url);
-      return `
-        <div class="track-item" onclick="playTrack(${i})">
-          <div style="font-size:11px; color:var(--text-muted);">${i+1}</div>
-          <img src="${t.cover}" class="track-img">
-          <div class="track-info">
-            <div style="font-weight:600; font-size:14px;">${t.title}</div>
-            <div style="font-size:12px; color:var(--text-secondary);">${t.artist}</div>
-          </div>
-          <div class="track-actions">
-            <button class="btn-player" style="color:var(--playlist-purple)" onclick="addToPlaylist(event, ${i})">+</button>
-            <button class="btn-player" style="color:${isFav?'#f1c40f':''}" onclick="toggleFav(event, ${i})">❤</button>
-          </div>
+    const list = document.getElementById('trackList');
+    let displayList = currentView === 'all' ? tracks : (currentView === 'favorite' ? favorites : customPlaylists[currentView] || []);
+
+    list.innerHTML = displayList.map((t, i) => `
+      <div class="track-item" onclick="playFromCurrentView(${i})">
+        <img src="${t.cover}" class="track-img">
+        <div class="track-info">
+          <div style="font-weight:600">${t.title}</div>
+          <div style="font-size:11px; color:var(--text-secondary)">${t.artist}</div>
         </div>
-      `;
-    }).join('');
+        <div class="track-actions">
+          <button class="btn-action" onclick="toggleFav(event, ${i})" style="color:${favorites.some(f => f.url === t.url) ? '#f7d794' : 'gray'}">❤</button>
+          <button class="btn-action" onclick="deleteTrack(event, ${i})" style="color:gray">✕</button>
+        </div>
+      </div>
+    `).join('');
   }
 
-  function playTrack(i) {
+  function playFromCurrentView(i) {
     let list = currentView === 'all' ? tracks : (currentView === 'favorite' ? favorites : customPlaylists[currentView]);
-    const t = list[i];
-    currentIdx = i;
+    const t = list[i]; currentIdx = i;
     document.getElementById('npTitle').innerText = t.title;
-    document.getElementById('npArtist').innerText = t.artist;
     document.getElementById('npImage').src = t.cover;
-    audio.src = t.url; audio.play();
-    updatePlayIcon(true);
+    audio.src = t.url; audio.play(); updatePlayIcon(true);
   }
 
   function togglePlay() {
-    if(!audio.src && tracks.length) playTrack(0);
-    else audio.paused ? (audio.play(), updatePlayIcon(true)) : (audio.pause(), updatePlayIcon(false));
+    if(!audio.src && tracks.length) return playFromCurrentView(0);
+    audio.paused ? (audio.play(), updatePlayIcon(true)) : (audio.pause(), updatePlayIcon(false));
   }
 
-  function updatePlayIcon(p) {
-    document.getElementById('playIcon').innerHTML = p ? '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>' : '<path d="M8 5v14l11-7z"/>';
+  function updatePlayIcon(playing) {
+    document.getElementById('playIcon').innerHTML = playing ? '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>' : '<path d="M8 5v14l11-7z"/>';
   }
-
-  function nextTrack() { if(currentIdx < tracks.length - 1) playTrack(currentIdx + 1); }
-  function prevTrack() { if(currentIdx > 0) playTrack(currentIdx - 1); }
 
   function toggleFav(e, i) {
     e.stopPropagation();
-    let t = tracks[i];
-    let idx = favorites.findIndex(f => f.url === t.url);
-    idx > -1 ? favorites.splice(idx, 1) : favorites.push(t);
+    let list = currentView === 'all' ? tracks : (currentView === 'favorite' ? favorites : customPlaylists[currentView]);
+    const t = list[i];
+    const fIdx = favorites.findIndex(f => f.url === t.url);
+    fIdx > -1 ? favorites.splice(fIdx, 1) : favorites.push(t);
     render();
   }
 
-  function addToPlaylist(e, i) {
+  function deleteTrack(e, i) {
     e.stopPropagation();
-    const pName = prompt("Nom de la playlist destination :");
-    if(customPlaylists[pName]) {
-      customPlaylists[pName].push(tracks[i]);
-      alert("Ajouté !");
-    }
+    if(currentView === 'all') tracks.splice(i, 1);
+    else if(currentView === 'favorite') favorites.splice(i, 1);
+    else customPlaylists[currentView].splice(i, 1);
+    render();
   }
 
-  function seek(e) { audio.currentTime = (e.offsetX / document.getElementById('pBar').offsetWidth) * audio.duration; }
-
-  function exportBackup() {
-    const blob = new Blob([JSON.stringify({tracks, favorites, customPlaylists})], {type: "application/json"});
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = "music_save.json"; a.click();
-  }
-
-  function importBackup(e) {
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const data = JSON.parse(ev.target.result);
-      tracks = data.tracks; favorites = data.favorites; customPlaylists = data.customPlaylists;
-      renderPlaylistsNav(); render();
-    };
-    reader.readAsText(e.target.files[0]);
-  }
-
+  function seek(e) { audio.currentTime = (e.offsetX / e.target.offsetWidth) * audio.duration; }
+  
   audio.ontimeupdate = () => {
     if(!audio.duration) return;
-    const pct = (audio.currentTime / audio.duration) * 100;
-    document.getElementById('progressFill').style.width = pct + '%';
-    document.getElementById('curTime').innerText = Math.floor(audio.currentTime/60)+":"+String(Math.floor(audio.currentTime%60)).padStart(2,'0');
-    document.getElementById('totTime').innerText = Math.floor(audio.duration/60)+":"+String(Math.floor(audio.duration%60)).padStart(2,'0');
+    document.getElementById('progressFill').style.width = (audio.currentTime / audio.duration) * 100 + '%';
   };
 </script>
 </body>
