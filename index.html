@@ -3,257 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SoundVault Cloud v2</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <title>SoundVault Cloud Fix</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg: #000000;
-            --sidebar: #121212;
-            --spotify-green: #1DB954;
-            --card-hover: #282828;
-            --text-main: #ffffff;
-            --text-dim: #b3b3b3;
-        }
-
-        body, html {
-            margin: 0; padding: 0; height: 100%;
-            font-family: 'Nunito', sans-serif;
-            background-color: var(--bg);
-            color: var(--text-main);
-            overflow: hidden;
-        }
-
-        .shell {
-            display: grid;
-            grid-template-columns: 380px 1fr;
-            height: 100vh;
-        }
-
-        /* --- PANNEAU GAUCHE (LECTEUR) --- */
-        .left {
-            background: linear-gradient(180deg, #222222 0%, #000000 100%);
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            border-right: 1px solid #282828;
-            text-align: center;
-        }
-
-        .cover-art {
-            width: 300px; height: 300px;
-            background: #282828;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 100px; overflow: hidden;
-        }
-        .cover-art img { width: 100%; height: 100%; object-fit: cover; }
-
-        .track-info h2 { margin: 10px 0 5px 0; font-size: 24px; }
-        .track-info p { color: var(--text-dim); margin: 0; }
-
-        .player-controls { width: 100%; margin-top: auto; padding-bottom: 20px; }
-        .prog-container {
-            width: 100%; height: 5px; background: #4f4f4f;
-            border-radius: 10px; margin: 20px 0; cursor: pointer;
-        }
-        .prog-bar { height: 100%; background: var(--spotify-green); border-radius: 10px; width: 0%; }
-
-        .play-btn {
-            background: white; border: none; width: 60px; height: 60px;
-            border-radius: 50%; font-size: 24px; cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .play-btn:hover { transform: scale(1.1); }
-
-        /* --- PANNEAU DROIT (BIBLIOTHÈQUE) --- */
-        .right {
-            padding: 30px;
-            overflow-y: auto;
-            background: #121212;
-        }
-
-        .import-section {
-            background: #181818;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-        }
-
-        textarea {
-            width: 100%; height: 100px;
-            background: #282828; border: 1px solid #3e3e3e;
-            color: white; border-radius: 6px; padding: 12px;
-            font-family: monospace; resize: none; margin-top: 10px;
-            box-sizing: border-box;
-        }
-
-        .btn-bulk {
-            background: var(--spotify-green); color: black;
-            border: none; padding: 12px 24px; border-radius: 30px;
-            font-weight: bold; cursor: pointer; margin-top: 15px;
-            transition: opacity 0.2s;
-        }
-        .btn-bulk:hover { opacity: 0.9; }
-
-        .playlist-header {
-            display: grid;
-            grid-template-columns: 50px 2fr 1fr 80px;
-            border-bottom: 1px solid #282828;
-            padding-bottom: 10px; color: var(--text-dim);
-            font-size: 14px; text-transform: uppercase;
-        }
-
-        .track-item {
-            display: grid;
-            grid-template-columns: 50px 2fr 1fr 80px;
-            padding: 12px 0;
-            border-radius: 6px;
-            align-items: center;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .track-item:hover { background: var(--card-hover); }
-        .track-item.playing { color: var(--spotify-green); }
-
-        .delete-btn { color: #ff4444; border: none; background: none; cursor: pointer; font-size: 18px; }
+        body { background: #121212; color: white; font-family: 'Nunito', sans-serif; padding: 20px; }
+        .box { background: #181818; padding: 20px; border-radius: 10px; border: 1px solid #333; }
+        textarea { width: 100%; height: 100px; background: #282828; color: white; border: 1px solid #spotify-green; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        button { background: #1DB954; color: black; border: none; padding: 15px 30px; border-radius: 30px; font-weight: bold; cursor: pointer; }
+        .track { background: #282828; padding: 10px; margin-top: 5px; border-radius: 5px; display: flex; justify-content: space-between; }
+        .play-btn { background: white; color: black; border-radius: 50%; width: 40px; height: 40px; border: none; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="shell">
-    <div class="left">
-        <div class="cover-art" id="mainCover">♫</div>
-        <div class="track-info">
-            <h2 id="curTitle">Prêt à écouter ?</h2>
-            <p id="curArtist">Sélectionnez une musique</p>
-        </div>
-        
-        <div class="player-controls">
-            <div class="prog-container" onclick="seek(event)">
-                <div class="prog-bar" id="progBar"></div>
-            </div>
-            <button class="play-btn" onclick="togglePlay()" id="playBtn">▶</button>
-        </div>
+    <div class="box">
+        <h1>Mon Spotify Privé</h1>
+        <p>Colle ta liste ici (Format : Nom | Artiste | Lien)</p>
+        <textarea id="bulkInput" placeholder="Exemple : Rai 01 | Suno | https://www.dropbox.com/s/xyz/01.mp3?dl=0"></textarea>
+        <br>
+        <button onclick="ajouterMusique()">🚀 IMPORTER MA LISTE</button>
     </div>
 
-    <div class="right">
-        <h1>Ma Musique Privée</h1>
+    <div id="liste" style="margin-top:20px;"></div>
 
-        <div class="import-section">
-            <label><strong>Importation rapide</strong> (Format : Titre | Artiste | URL Dropbox)</label>
-            <textarea id="bulkInput" placeholder="Exemple :&#10;Ma Musique | Artiste | https://www.dropbox.com/s/xyz/song.mp3?raw=1"></textarea>
-            <button class="btn-bulk" onclick="addBulkTracks()">Importer la liste</button>
-        </div>
+    <script>
+        let maListe = JSON.parse(localStorage.getItem('maMusique')) || [];
 
-        <div class="playlist-header">
-            <span>#</span><span>Titre</span><span>Artiste</span><span>Action</span>
-        </div>
-        <div id="listContainer"></div>
-    </div>
-</div>
+        function ajouterMusique() {
+            const texte = document.getElementById('bulkInput').value;
+            const lignes = texte.split('\n');
+            let ajouts = 0;
 
-<script>
-    let playlist = JSON.parse(localStorage.getItem('cloud_v2_list')) || [];
-    let audio = new Audio();
-    let isPlaying = false;
-    let currentIndex = -1;
+            lignes.forEach(ligne => {
+                if(ligne.includes('|')) {
+                    let infos = ligne.split('|');
+                    let titre = infos[0].trim();
+                    let artiste = infos[1].trim();
+                    let url = infos[2] ? infos[2].trim() : "";
 
-    // FONCTION MAGIQUE : AJOUTER TOUTE UNE LISTE
-    function addBulkTracks() {
-        const text = document.getElementById('bulkInput').value;
-        const lines = text.split('\n');
-        let count = 0;
-
-        lines.forEach(line => {
-            if(line.trim() !== "") {
-                let [title, artist, url] = line.split('|').map(item => item.trim());
-                
-                if(title && url) {
-                    // Correction automatique Dropbox
-                    if(url.includes('dropbox.com')) {
-                        url = url.replace('dl=0', 'raw=1').replace('www.dropbox.com', 'dl.dropboxusercontent.com');
+                    if(url.includes('http')) {
+                        // On transforme le lien Dropbox automatiquement
+                        url = url.replace('?dl=0', '?raw=1');
+                        maListe.push({ titre, artiste, url });
+                        ajouts++;
+                    } else {
+                        alert("Erreur : Le lien pour '" + titre + "' n'est pas une adresse web (URL)");
                     }
-                    playlist.push({ title, artist: artist || "Inconnu", url });
-                    count++;
                 }
+            });
+
+            if(ajouts > 0) {
+                localStorage.setItem('maMusique', JSON.stringify(maListe));
+                alert(ajouts + " musique(s) ajoutée(s) !");
+                afficher();
+            } else {
+                alert("Rien n'a été ajouté. Vérifie que tu as bien mis le signe | entre le nom et le lien.");
             }
-        });
-
-        if(count > 0) {
-            saveAndRender();
-            document.getElementById('bulkInput').value = "";
-            alert(count + " musiques ajoutées avec succès !");
         }
-    }
 
-    function saveAndRender() {
-        localStorage.setItem('cloud_v2_list', JSON.stringify(playlist));
-        render();
-    }
-
-    function render() {
-        const container = document.getElementById('listContainer');
-        container.innerHTML = playlist.map((t, i) => `
-            <div class="track-item ${currentIndex === i ? 'playing' : ''}" onclick="playTrack(${i})">
-                <span style="color: var(--text-dim)">${i + 1}</span>
-                <span><strong>${t.title}</strong></span>
-                <span style="color: var(--text-dim)">${t.artist}</span>
-                <button class="delete-btn" onclick="deleteTrack(event, ${i})">×</button>
-            </div>
-        `).join('');
-    }
-
-    function playTrack(i) {
-        currentIndex = i;
-        const t = playlist[i];
-        document.getElementById('curTitle').innerText = t.title;
-        document.getElementById('curArtist').innerText = t.artist;
-        
-        audio.src = t.url;
-        audio.play();
-        isPlaying = true;
-        document.getElementById('playBtn').innerText = '⏸';
-        render();
-    }
-
-    function togglePlay() {
-        if(!audio.src && playlist.length > 0) return playTrack(0);
-        if(isPlaying) { audio.pause(); document.getElementById('playBtn').innerText = '▶'; }
-        else { audio.play(); document.getElementById('playBtn').innerText = '⏸'; }
-        isPlaying = !isPlaying;
-    }
-
-    function deleteTrack(e, i) {
-        e.stopPropagation();
-        playlist.splice(i, 1);
-        saveAndRender();
-    }
-
-    function seek(e) {
-        if(!audio.duration) return;
-        const container = e.currentTarget;
-        const rect = container.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const pct = x / rect.width;
-        audio.currentTime = pct * audio.duration;
-    }
-
-    audio.ontimeupdate = () => {
-        if(audio.duration) {
-            const pct = (audio.currentTime / audio.duration) * 100;
-            document.getElementById('progBar').style.width = pct + '%';
+        function afficher() {
+            const div = document.getElementById('liste');
+            div.innerHTML = maListe.map((m, i) => `
+                <div class="track">
+                    <span><strong>${m.titre}</strong> - ${m.artiste}</span>
+                    <button class="play-btn" onclick="jouer('${m.url}')">▶</button>
+                    <button onclick="supprimer(${i})" style="background:none; color:red; border:none; cursor:pointer;">X</button>
+                </div>
+            `).join('');
         }
-    };
 
-    // Lecture automatique de la suivante
-    audio.onended = () => {
-        if(currentIndex + 1 < playlist.length) playTrack(currentIndex + 1);
-    };
+        let audio = new Audio();
+        function jouer(url) {
+            audio.src = url;
+            audio.play();
+        }
 
-    render();
-</script>
+        function supprimer(i) {
+            maListe.splice(i, 1);
+            localStorage.setItem('maMusique', JSON.stringify(maListe));
+            afficher();
+        }
+
+        afficher();
+    </script>
 </body>
 </html>
