@@ -3,254 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SoundVault Cloud v2</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <title>SoundVault Fix</title>
     <style>
-        :root {
-            --bg: #000000;
-            --sidebar: #121212;
-            --spotify-green: #1DB954;
-            --card-hover: #282828;
-            --text-main: #ffffff;
-            --text-dim: #b3b3b3;
-        }
+        :root { --green: #1DB954; --bg: #121212; --card: #181818; }
+        body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; display: flex; height: 100vh; }
+        
+        /* SIDEBAR */
+        .sidebar { width: 250px; background: black; padding: 20px; border-right: 1px solid #282828; }
+        .nav-btn { padding: 10px; cursor: pointer; display: block; width: 100%; text-align: left; background: none; color: #b3b3b3; border: none; font-size: 16px; }
+        .nav-btn:hover { color: white; }
 
-        body, html {
-            margin: 0; padding: 0; height: 100%;
-            font-family: 'Nunito', sans-serif;
-            background-color: var(--bg);
-            color: var(--text-main);
-            overflow: hidden;
-        }
+        /* MAIN */
+        .main { flex: 1; padding: 20px; overflow-y: auto; padding-bottom: 120px; }
+        .import-zone { background: var(--card); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        textarea { width: 100%; height: 60px; background: #282828; color: white; border: 1px solid #333; margin: 10px 0; border-radius: 4px; padding: 10px; }
+        
+        /* TRACKS */
+        .track { display: grid; grid-template-columns: 1fr 1fr 120px; padding: 10px; border-bottom: 1px solid #282828; align-items: center; }
+        .track:hover { background: #282828; }
+        .btn-heart { background: none; border: none; cursor: pointer; font-size: 20px; color: #555; }
+        .btn-heart.active { color: #e91e63; }
 
-        .shell {
-            display: grid;
-            grid-template-columns: 380px 1fr;
-            height: 100vh;
-        }
-
-        /* --- PANNEAU GAUCHE (LECTEUR) --- */
-        .left {
-            background: linear-gradient(180deg, #222222 0%, #000000 100%);
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            border-right: 1px solid #282828;
-            text-align: center;
-        }
-
-        .cover-art {
-            width: 300px; height: 300px;
-            background: #282828;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 100px; overflow: hidden;
-        }
-        .cover-art img { width: 100%; height: 100%; object-fit: cover; }
-
-        .track-info h2 { margin: 10px 0 5px 0; font-size: 24px; }
-        .track-info p { color: var(--text-dim); margin: 0; }
-
-        .player-controls { width: 100%; margin-top: auto; padding-bottom: 20px; }
-        .prog-container {
-            width: 100%; height: 5px; background: #4f4f4f;
-            border-radius: 10px; margin: 20px 0; cursor: pointer;
-        }
-        .prog-bar { height: 100%; background: var(--spotify-green); border-radius: 10px; width: 0%; }
-
-        .play-btn {
-            background: white; border: none; width: 60px; height: 60px;
-            border-radius: 50%; font-size: 24px; cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .play-btn:hover { transform: scale(1.1); }
-
-        /* --- PANNEAU DROIT (BIBLIOTHÈQUE) --- */
-        .right {
-            padding: 30px;
-            overflow-y: auto;
-            background: #121212;
-        }
-
-        .import-section {
-            background: #181818;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-        }
-
-        textarea {
-            width: 100%; height: 100px;
-            background: #282828; border: 1px solid #3e3e3e;
-            color: white; border-radius: 6px; padding: 12px;
-            font-family: monospace; resize: none; margin-top: 10px;
-            box-sizing: border-box;
-        }
-
-        .btn-bulk {
-            background: var(--spotify-green); color: black;
-            border: none; padding: 12px 24px; border-radius: 30px;
-            font-weight: bold; cursor: pointer; margin-top: 15px;
-            transition: opacity 0.2s;
-        }
-        .btn-bulk:hover { opacity: 0.9; }
-
-        .playlist-header {
-            display: grid;
-            grid-template-columns: 50px 2fr 1fr 80px;
-            border-bottom: 1px solid #282828;
-            padding-bottom: 10px; color: var(--text-dim);
-            font-size: 14px; text-transform: uppercase;
-        }
-
-        .track-item {
-            display: grid;
-            grid-template-columns: 50px 2fr 1fr 80px;
-            padding: 12px 0;
-            border-radius: 6px;
-            align-items: center;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .track-item:hover { background: var(--card-hover); }
-        .track-item.playing { color: var(--spotify-green); }
-
-        .delete-btn { color: #ff4444; border: none; background: none; cursor: pointer; font-size: 18px; }
+        /* BARRE DE LECTURE (EN BAS) */
+        .player-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #000; height: 90px; display: flex; align-items: center; padding: 0 20px; border-top: 1px solid #282828; }
+        .controls { flex: 1; text-align: center; }
+        .vol-zone { width: 200px; display: flex; align-items: center; gap: 10px; }
+        
+        button.circle { width: 40px; height: 40px; border-radius: 50%; border: none; cursor: pointer; font-weight: bold; }
+        .play-btn { background: white; color: black; font-size: 20px; }
+        
+        .progress-bg { width: 100%; max-width: 500px; height: 4px; background: #4f4f4f; margin: 10px auto; border-radius: 2px; cursor: pointer; position: relative; }
+        .progress-fill { height: 100%; background: var(--green); width: 0%; border-radius: 2px; }
     </style>
 </head>
 <body>
 
-<div class="shell">
-    <div class="left">
-        <div class="cover-art" id="mainCover">♫</div>
-        <div class="track-info">
-            <h2 id="curTitle">Prêt à écouter ?</h2>
-            <p id="curArtist">Sélectionnez une musique</p>
-        </div>
-        
-        <div class="player-controls">
-            <div class="prog-container" onclick="seek(event)">
-                <div class="prog-bar" id="progBar"></div>
-            </div>
-            <button class="play-btn" onclick="togglePlay()" id="playBtn">▶</button>
+<div class="sidebar">
+    <h3>Ma Biblio</h3>
+    <button class="nav-btn" onclick="filterPl('Toutes')">🏠 Accueil</button>
+    <button class="nav-btn" onclick="filterPl('Favoris')">❤️ Favoris</button>
+    <hr>
+    <button class="nav-btn" onclick="addPlaylist()">+ Créer Playlist</button>
+    <div id="plDisplay"></div>
+</div>
+
+<div class="main">
+    <div class="import-zone">
+        <strong>Ajout Rapide</strong> (Nom | Artiste | Lien Dropbox)
+        <textarea id="bulkText" placeholder="Ex: Rai 01 | Suno | https://..."></textarea>
+        <button onclick="importNow()" style="background:var(--green); border:none; padding:10px 20px; border-radius:20px; font-weight:bold; cursor:pointer;">🚀 Importer</button>
+    </div>
+    
+    <h2 id="viewTitle">Toutes les musiques</h2>
+    <div id="trackList"></div>
+</div>
+
+<div class="player-bar">
+    <div style="width:200px;">
+        <div id="nowT" style="font-weight:bold; font-size:14px;">---</div>
+        <div id="nowA" style="font-size:12px; color:#b3b3b3;">Choisissez un titre</div>
+    </div>
+
+    <div class="controls">
+        <button onclick="prev()" style="background:none; color:white; border:none; font-size:20px; cursor:pointer;">⏮</button>
+        <button class="circle play-btn" id="playB" onclick="toggleP()">▶</button>
+        <button onclick="next()" style="background:none; color:white; border:none; font-size:20px; cursor:pointer;">⏭</button>
+        <div class="progress-bg" onclick="seek(event)">
+            <div class="progress-fill" id="pFill"></div>
         </div>
     </div>
 
-    <div class="right">
-        <h1>Ma Musique Privée</h1>
-
-        <div class="import-section">
-            <label><strong>Importation rapide</strong> (Format : Titre | Artiste | URL Dropbox)</label>
-            <textarea id="bulkInput" placeholder="Exemple :&#10;Ma Musique | Artiste | https://www.dropbox.com/s/xyz/song.mp3?raw=1"></textarea>
-            <button class="btn-bulk" onclick="addBulkTracks()">Importer la liste</button>
-        </div>
-
-        <div class="playlist-header">
-            <span>#</span><span>Titre</span><span>Artiste</span><span>Action</span>
-        </div>
-        <div id="listContainer"></div>
+    <div class="vol-zone">
+        <span>🔈</span>
+        <input type="range" min="0" max="100" value="80" oninput="changeVol(this.value)">
     </div>
 </div>
 
 <script>
-    let playlist = JSON.parse(localStorage.getItem('cloud_v2_list')) || [];
-    let audio = new Audio();
-    let isPlaying = false;
-    let currentIndex = -1;
+    let db = JSON.parse(localStorage.getItem('myMusicDB')) || { tracks: [], playlists: {}, view: 'Toutes' };
+    let player = new Audio();
 
-    // FONCTION MAGIQUE : AJOUTER TOUTE UNE LISTE
-    function addBulkTracks() {
-        const text = document.getElementById('bulkInput').value;
-        const lines = text.split('\n');
-        let count = 0;
+    function save() { localStorage.setItem('myMusicDB', JSON.stringify(db)); render(); }
 
-        lines.forEach(line => {
-            if(line.trim() !== "") {
-                let [title, artist, url] = line.split('|').map(item => item.trim());
-                
-                if(title && url) {
-                    // Correction automatique Dropbox
-                    if(url.includes('dropbox.com')) {
-                        url = url.replace('dl=0', 'raw=1').replace('www.dropbox.com', 'dl.dropboxusercontent.com');
-                    }
-                    playlist.push({ title, artist: artist || "Inconnu", url });
-                    count++;
+    function importNow() {
+        let lines = document.getElementById('bulkText').value.split('\n');
+        lines.forEach(l => {
+            if(l.includes('|')) {
+                let [t, a, u] = l.split('|').map(s => s.trim());
+                if(u) {
+                    u = u.replace('dl=0', 'raw=1');
+                    db.tracks.push({ id: Date.now() + Math.random(), t, a, u, fav: false });
                 }
             }
         });
-
-        if(count > 0) {
-            saveAndRender();
-            document.getElementById('bulkInput').value = "";
-            alert(count + " musiques ajoutées avec succès !");
-        }
-    }
-
-    function saveAndRender() {
-        localStorage.setItem('cloud_v2_list', JSON.stringify(playlist));
-        render();
+        document.getElementById('bulkText').value = "";
+        save();
     }
 
     function render() {
-        const container = document.getElementById('listContainer');
-        container.innerHTML = playlist.map((t, i) => `
-            <div class="track-item ${currentIndex === i ? 'playing' : ''}" onclick="playTrack(${i})">
-                <span style="color: var(--text-dim)">${i + 1}</span>
-                <span><strong>${t.title}</strong></span>
-                <span style="color: var(--text-dim)">${t.artist}</span>
-                <button class="delete-btn" onclick="deleteTrack(event, ${i})">×</button>
+        let list = db.tracks;
+        if(db.view === 'Favoris') list = db.tracks.filter(t => t.fav);
+        
+        document.getElementById('viewTitle').innerText = db.view;
+        document.getElementById('trackList').innerHTML = list.map((t, i) => `
+            <div class="track">
+                <div onclick="playMe(${db.tracks.indexOf(t)})"><strong>${t.t}</strong></div>
+                <div style="color:#b3b3b3">${t.a}</div>
+                <div>
+                    <button class="btn-heart ${t.fav?'active':''}" onclick="toggleF(${t.id})">❤</button>
+                    <button onclick="delT(${t.id})" style="background:none; border:none; color:red; cursor:pointer;">🗑</button>
+                </div>
             </div>
         `).join('');
     }
 
-    function playTrack(i) {
-        currentIndex = i;
-        const t = playlist[i];
-        document.getElementById('curTitle').innerText = t.title;
-        document.getElementById('curArtist').innerText = t.artist;
-        
-        audio.src = t.url;
-        audio.play();
-        isPlaying = true;
-        document.getElementById('playBtn').innerText = '⏸';
-        render();
+    function playMe(idx) {
+        let t = db.tracks[idx];
+        document.getElementById('nowT').innerText = t.t;
+        document.getElementById('nowA').innerText = t.a;
+        player.src = t.u;
+        player.play();
+        document.getElementById('playB').innerText = '⏸';
     }
 
-    function togglePlay() {
-        if(!audio.src && playlist.length > 0) return playTrack(0);
-        if(isPlaying) { audio.pause(); document.getElementById('playBtn').innerText = '▶'; }
-        else { audio.play(); document.getElementById('playBtn').innerText = '⏸'; }
-        isPlaying = !isPlaying;
+    function toggleP() {
+        if(player.paused) { player.play(); document.getElementById('playB').innerText = '⏸'; }
+        else { player.pause(); document.getElementById('playB').innerText = '▶'; }
     }
 
-    function deleteTrack(e, i) {
-        e.stopPropagation();
-        playlist.splice(i, 1);
-        saveAndRender();
-    }
+    function changeVol(v) { player.volume = v/100; }
+    function toggleF(id) { let t = db.tracks.find(x => x.id === id); t.fav = !t.fav; save(); }
+    function delT(id) { db.tracks = db.tracks.filter(t => t.id !== id); save(); }
+    function filterPl(name) { db.view = name; render(); }
 
-    function seek(e) {
-        if(!audio.duration) return;
-        const container = e.currentTarget;
-        const rect = container.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const pct = x / rect.width;
-        audio.currentTime = pct * audio.duration;
-    }
-
-    audio.ontimeupdate = () => {
-        if(audio.duration) {
-            const pct = (audio.currentTime / audio.duration) * 100;
-            document.getElementById('progBar').style.width = pct + '%';
-        }
-    };
-
-    // Lecture automatique de la suivante
-    audio.onended = () => {
-        if(currentIndex + 1 < playlist.length) playTrack(currentIndex + 1);
+    player.ontimeupdate = () => {
+        let p = (player.currentTime / player.duration) * 100;
+        document.getElementById('pFill').style.width = p + '%';
     };
 
     render();
