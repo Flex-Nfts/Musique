@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SoundWave — Minimalist Pro</title>
+<title>SoundWave — Ultra Clean UI</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -12,6 +12,8 @@
     --bg-card: #1a1e2a;
     --bg-hover: #1f2436;
     --accent: #4f6ef7;
+    --accent-gradient: linear-gradient(90deg, #4f6ef7, #7c94f0);
+    --import-red: #eb4d4b;
     --text-primary: #e8eaf2;
     --text-secondary: #6b7394;
     --text-muted: #3d4260;
@@ -26,84 +28,81 @@
   .app { display: grid; grid-template-columns: var(--sidebar-w) 1fr; grid-template-rows: 1fr var(--player-h); height: 100vh; }
 
   /* SIDEBAR */
-  .sidebar { background: var(--bg-panel); border-right: 1px solid var(--border); padding: 20px 12px; display: flex; flex-direction: column; gap: 4px; }
-  .section-label { font-family: 'Syne', sans-serif; font-size: 10px; text-transform: uppercase; color: var(--text-muted); margin: 15px 8px 8px 8px; letter-spacing: 1px; }
+  .sidebar { background: var(--bg-panel); border-right: 1px solid var(--border); padding: 20px 12px; display: flex; flex-direction: column; gap: 8px; }
+  .section-label { font-family: 'Syne', sans-serif; font-size: 10px; text-transform: uppercase; color: var(--text-muted); margin: 15px 8px 5px 8px; letter-spacing: 1px; }
   
   .nav-item { 
-    display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 6px; 
-    cursor: pointer; color: var(--text-secondary); transition: 0.2s; font-size: 13px;
+    display: flex; align-items: center; padding: 12px 15px; border-radius: 10px; 
+    cursor: pointer; color: var(--text-secondary); transition: all 0.3s ease; font-size: 14px; font-weight: 500;
   }
-  .nav-item:hover, .nav-item.active { background: var(--bg-hover); color: var(--text-primary); }
-  .nav-link { display: flex; align-items: center; gap: 10px; flex: 1; }
-  .nav-item svg { width: 16px; height: 16px; }
+  .nav-item:hover { color: var(--text-primary); background: var(--bg-hover); }
+  .nav-item.active { background: var(--accent-gradient); color: white !important; box-shadow: 0 4px 15px rgba(79, 110, 247, 0.3); }
+  .nav-link { display: flex; align-items: center; gap: 12px; }
+  .nav-item svg { width: 18px; height: 18px; }
 
-  .btn-mini { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 2px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-  .btn-mini:hover { color: var(--accent); }
-
-  .import-badge { 
-    margin-top: auto; align-self: center; padding: 6px 14px;
-    background: var(--accent); color: white; border-radius: 20px; cursor: pointer; font-size: 11px; font-weight: 600;
-    border: none; transition: 0.2s;
+  .import-badge-red { 
+    margin-top: auto; padding: 10px; background: var(--import-red); color: white; border-radius: 8px; 
+    cursor: pointer; font-size: 12px; font-weight: 800; border: none; transition: 0.2s; width: 100%;
+    text-transform: uppercase; letter-spacing: 1px;
   }
+  .import-badge-red:hover { background: #ff5e57; transform: translateY(-2px); }
 
   /* MAIN CONTENT */
   .main { overflow-y: auto; padding: 30px; }
-  .view-title { font-family: 'Syne', sans-serif; font-size: 22px; margin-bottom: 20px; }
+  .view-title { font-family: 'Syne', sans-serif; font-size: 24px; margin-bottom: 25px; }
 
-  /* TRACK LIST */
+  /* TRACK LIST (SUPPRESSION DES POINTS DE DURÉE) */
   .track-item { 
-    display: grid; grid-template-columns: 30px 1fr 100px 40px; align-items: center; 
-    padding: 10px 12px; border-radius: 8px; cursor: pointer; transition: 0.1s; border-bottom: 1px solid var(--border);
+    display: grid; grid-template-columns: 35px 1fr 100px; align-items: center; 
+    padding: 12px; border-radius: 12px; cursor: pointer; transition: 0.2s; margin-bottom: 2px;
   }
   .track-item:hover { background: var(--bg-card); }
-  .track-item.playing { color: var(--accent); font-weight: 600; }
+  .track-item.playing { color: var(--accent); }
   
-  .track-actions { display: flex; gap: 10px; justify-content: flex-end; opacity: 0; }
+  .track-actions { display: flex; gap: 15px; justify-content: flex-end; opacity: 0; }
   .track-item:hover .track-actions { opacity: 1; }
   
-  .btn-action { background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 5px; font-size: 14px; transition: 0.2s; }
-  .btn-action:hover { transform: scale(1.2); }
-  .btn-delete:hover { color: #ff4d4d; }
-  .btn-fav.is-fav { color: #f7d794; }
+  .btn-action { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 14px; }
+  .btn-action:hover { color: white; }
+  .btn-action.is-fav { color: #f7d794; }
 
   /* PLAYER BAR */
-  .player { 
-    grid-column: 1 / 3; background: var(--bg-panel); border-top: 1px solid var(--border); 
-    display: flex; align-items: center; padding: 0 25px; gap: 20px;
-  }
-  .player-info { width: 220px; overflow: hidden; }
-  .player-controls { display: flex; flex-direction: column; align-items: center; flex: 1; gap: 8px; }
-  .ctrl-btns { display: flex; align-items: center; gap: 20px; }
-  .btn-p { background: none; border: none; color: var(--text-primary); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-  .btn-p:hover { color: var(--accent); }
-  .btn-play { width: 38px; height: 38px; border-radius: 50%; background: white; color: black; }
+  .player { grid-column: 1 / 3; background: #08090d; border-top: 1px solid var(--border); display: flex; align-items: center; padding: 0 30px; justify-content: space-between; }
+  .player-left-controls { display: flex; align-items: center; gap: 25px; width: 150px; }
+  .btn-img-style { background: none; border: none; color: white; cursor: pointer; display: flex; align-items: center; }
+  .btn-img-style svg { width: 20px; height: 20px; fill: currentColor; }
 
-  .volume-ctrl { width: 180px; display: flex; align-items: center; gap: 10px; justify-content: flex-end; }
-  input[type=range] { accent-color: var(--accent); height: 4px; cursor: pointer; }
+  .player-center { flex: 1; display: flex; align-items: center; gap: 20px; padding: 0 40px; }
+  .mini-cover { width: 40px; height: 40px; border-radius: 6px; background: var(--bg-card); display:flex; align-items:center; justify-content:center; font-size:10px; }
+  .track-meta { min-width: 140px; }
+  .progress-container { flex: 1; display: flex; align-items: center; gap: 15px; }
+  .time-stamp { font-size: 11px; color: var(--text-muted); min-width: 35px; }
+  .progress-line-bg { flex: 1; height: 3px; background: #2a2d3a; border-radius: 2px; cursor: pointer; }
+  .progress-line-fill { height: 100%; background: var(--accent); width: 0%; border-radius: 2px; box-shadow: 0 0 8px var(--accent); }
 
-  .progress-area { width: 100%; display: flex; align-items: center; gap: 12px; font-size: 11px; color: var(--text-muted); }
-  .bar-bg { flex: 1; height: 4px; background: var(--bg-card); border-radius: 2px; cursor: pointer; position: relative; }
-  .bar-fill { height: 100%; background: var(--accent); width: 0%; border-radius: 2px; }
+  .player-right { display: flex; align-items: center; gap: 10px; width: 150px; justify-content: flex-end; }
+  input[type=range] { accent-color: var(--accent); cursor: pointer; }
 
   /* MODAL */
   .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(4px); }
   .modal.open { display: flex; }
-  .modal-content { background: var(--bg-panel); padding: 25px; border-radius: 12px; width: 500px; border: 1px solid var(--border); }
-  textarea { width: 100%; height: 180px; background: var(--bg-deep); border: 1px solid var(--border); border-radius: 6px; color: white; padding: 12px; margin: 15px 0; font-family: monospace; font-size: 12px; resize: none; outline: none; }
+  .modal-content { background: var(--bg-panel); padding: 25px; border-radius: 12px; width: 450px; border: 1px solid var(--border); }
+  textarea { width: 100%; height: 150px; background: var(--bg-deep); border: 1px solid var(--border); border-radius: 8px; color: white; padding: 12px; margin: 15px 0; resize: none; outline: none; }
 </style>
 </head>
 <body>
 
 <div class="app">
   <aside class="sidebar">
-    <div class="section-label">Ma Musique</div>
+    <div class="section-label">Menu</div>
+    
     <div class="nav-item active" id="nav-playlist" onclick="showView('playlist')">
       <div class="nav-link">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-        Playlist
+        Playlists
       </div>
-      <button class="btn-mini" onclick="toggleModal(true)">+</button>
     </div>
+
     <div class="nav-item" id="nav-favorite" onclick="showView('favorite')">
       <div class="nav-link">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -111,7 +110,7 @@
       </div>
     </div>
 
-    <button class="import-badge" onclick="toggleModal(true)">Import Playlist</button>
+    <button class="import-badge-red" onclick="toggleModal(true)">Import</button>
   </aside>
 
   <main class="main">
@@ -126,32 +125,27 @@
   </main>
 
   <footer class="player">
-    <div class="player-info">
-      <div id="npTitle" style="font-size:13px; font-weight:600; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">Prêt à l'écoute</div>
-      <div id="npArtist" style="font-size:11px; color:var(--text-secondary)">Sélectionnez un titre</div>
+    <div class="player-left-controls">
+      <button class="btn-img-style" onclick="prevTrack()"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
+      <button class="btn-img-style" onclick="togglePlay()"><svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+      <button class="btn-img-style" onclick="nextTrack()"><svg viewBox="0 0 24 24"><path d="M16 6h2v12h-2zm-10.5 0v12l8.5-6z"/></svg></button>
     </div>
 
-    <div class="player-controls">
-      <div class="ctrl-btns">
-        <button class="btn-p" onclick="prevTrack()">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="19,20 9,12 19,4"/><rect x="5" y="4" width="2" height="16"/></svg>
-        </button>
-        <button class="btn-p btn-play" onclick="togglePlay()">
-          <svg id="playIcon" width="18" height="18" viewBox="0 0 24 24" fill="black"><polygon points="5,3 19,12 5,21"/></svg>
-        </button>
-        <button class="btn-p" onclick="nextTrack()">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,4 15,12 5,20"/><rect x="17" y="4" width="2" height="16"/></svg>
-        </button>
+    <div class="player-center">
+      <div class="mini-cover">RAI</div>
+      <div class="track-meta">
+        <div id="npTitle" style="font-size: 13px; font-weight: 600;">Aucun titre</div>
+        <div id="npArtist" style="font-size: 11px; color: var(--text-secondary);">Prêt à l'écoute</div>
       </div>
-      <div class="progress-area">
-        <span id="curTime">0:00</span>
-        <div class="bar-bg" id="pBar" onclick="seek(event)"><div class="bar-fill" id="progressFill"></div></div>
-        <span id="totTime">0:00</span>
+      <div class="progress-container">
+        <span class="time-stamp" id="curTime">0:00</span>
+        <div class="progress-line-bg" id="pBar" onclick="seek(event)"><div class="progress-line-fill" id="progressFill"></div></div>
+        <span class="time-stamp" id="totTime">0:00</span>
       </div>
     </div>
 
-    <div class="volume-ctrl">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/></svg>
+    <div class="player-right">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/></svg>
       <input type="range" min="0" max="1" step="0.01" value="0.8" oninput="audio.volume = this.value">
     </div>
   </footer>
@@ -159,11 +153,11 @@
 
 <div class="modal" id="importModal">
   <div class="modal-content">
-    <h2 style="font-size:18px">Importer</h2>
+    <h2 style="font-size:18px">Ajouter des musiques</h2>
     <textarea id="importInput" placeholder="Titre | Artiste | Lien Dropbox"></textarea>
     <div style="display:flex; justify-content:flex-end; gap:10px">
       <button onclick="toggleModal(false)" style="background:none; border:none; color:white; cursor:pointer">Annuler</button>
-      <button onclick="processImport()" style="background:var(--accent); border:none; color:white; padding:8px 16px; border-radius:6px; cursor:pointer; font-weight:600">Ajouter</button>
+      <button onclick="processImport()" style="background:var(--import-red); border:none; color:white; padding:8px 20px; border-radius:8px; cursor:pointer; font-weight:700">IMPORT</button>
     </div>
   </div>
 </div>
@@ -190,7 +184,7 @@
     input.split('\n').forEach(line => {
       if(line.includes('|')) {
         const [title, artist, url] = line.split('|').map(s => s.trim());
-        tracks.push({ title, artist, url, id: Date.now() + Math.random() });
+        tracks.push({ title, artist, url });
       }
     });
     render();
@@ -211,28 +205,47 @@
           ${t.title} <span style="font-size:11px; opacity:0.5; margin-left:8px">${t.artist}</span>
         </div>
         <div class="track-actions">
-          <button class="btn-action btn-fav ${isFav ? 'is-fav' : ''}" onclick="toggleFav(event, '${listType}', ${i})">❤</button>
-          <button class="btn-action btn-delete" onclick="deleteTrack(event, '${listType}', ${i})">✕</button>
+          <button class="btn-action ${isFav ? 'is-fav' : ''}" onclick="toggleFav(event, '${listType}', ${i})">❤</button>
+          <button class="btn-action" onclick="deleteTrack(event, '${listType}', ${i})">✕</button>
         </div>
-        <div style="font-size:11px; color:var(--text-muted); text-align:right">••:••</div>
       </div>`;
     };
 
-    list.innerHTML = tracks.length ? tracks.map((t, i) => getHTML(t, i, 'main')).join('') : '<p style="color:var(--text-muted); padding:20px">Playlist vide.</p>';
-    fList.innerHTML = favorites.length ? favorites.map((t, i) => getHTML(t, i, 'fav')).join('') : '<p style="color:var(--text-muted); padding:20px">Aucun favori.</p>';
+    list.innerHTML = tracks.map((t, i) => getHTML(t, i, 'main')).join('');
+    fList.innerHTML = favorites.map((t, i) => getHTML(t, i, 'fav')).join('');
   }
 
   function playFromList(type, i) {
     const list = type === 'main' ? tracks : favorites;
     const t = list[i];
-    // On cherche l'index réel dans la liste principale pour la navigation next/prev
     currentIdx = tracks.findIndex(item => item.url === t.url);
-    
     document.getElementById('npTitle').innerText = t.title;
     document.getElementById('npArtist').innerText = t.artist;
     audio.src = t.url;
     audio.play();
     updatePlayIcon(true);
+    render();
+  }
+
+  function togglePlay() {
+    if(!audio.src && tracks.length) { playFromList('main', 0); return; }
+    if(audio.paused) { audio.play(); updatePlayIcon(true); } else { audio.pause(); updatePlayIcon(false); }
+  }
+
+  function updatePlayIcon(playing) {
+    const icon = document.getElementById('playIcon');
+    icon.innerHTML = playing ? '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>' : '<path d="M8 5v14l11-7z"/>';
+  }
+
+  function nextTrack() { if(currentIdx < tracks.length - 1) playFromList('main', currentIdx + 1); }
+  function prevTrack() { if(currentIdx > 0) playFromList('main', currentIdx - 1); }
+
+  function toggleFav(e, type, i) {
+    e.stopPropagation();
+    const list = type === 'main' ? tracks : favorites;
+    const t = list[i];
+    const favIdx = favorites.findIndex(f => f.url === t.url);
+    if(favIdx > -1) favorites.splice(favIdx, 1); else favorites.push(t);
     render();
   }
 
@@ -247,32 +260,6 @@
     render();
   }
 
-  function toggleFav(e, type, i) {
-    e.stopPropagation();
-    const list = type === 'main' ? tracks : favorites;
-    const t = list[i];
-    const favIdx = favorites.findIndex(f => f.url === t.url);
-    
-    if(favIdx > -1) favorites.splice(favIdx, 1);
-    else favorites.push(t);
-    render();
-  }
-
-  function togglePlay() {
-    if(!audio.src && tracks.length) { playFromList('main', 0); return; }
-    if(audio.paused) { audio.play(); updatePlayIcon(true); }
-    else { audio.pause(); updatePlayIcon(false); }
-  }
-
-  function updatePlayIcon(playing) {
-    document.getElementById('playIcon').innerHTML = playing ? 
-      '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>' : 
-      '<polygon points="5,3 19,12 5,21"/>';
-  }
-
-  function nextTrack() { if(currentIdx < tracks.length - 1) playFromList('main', currentIdx + 1); }
-  function prevTrack() { if(currentIdx > 0) playFromList('main', currentIdx - 1); }
-  
   function seek(e) {
     const pct = e.offsetX / document.getElementById('pBar').offsetWidth;
     audio.currentTime = pct * audio.duration;
@@ -282,13 +269,8 @@
     if(!audio.duration) return;
     const pct = (audio.currentTime / audio.duration) * 100;
     document.getElementById('progressFill').style.width = pct + '%';
-    const m = Math.floor(audio.currentTime / 60);
-    const s = Math.floor(audio.currentTime % 60);
-    document.getElementById('curTime').innerText = `${m}:${s<10?'0':''}${s}`;
-    
-    const tm = Math.floor(audio.duration / 60);
-    const ts = Math.floor(audio.duration % 60);
-    document.getElementById('totTime').innerText = `${tm}:${ts<10?'0':''}${ts}`;
+    document.getElementById('curTime').innerText = Math.floor(audio.currentTime / 60) + ":" + String(Math.floor(audio.currentTime % 60)).padStart(2, '0');
+    document.getElementById('totTime').innerText = Math.floor(audio.duration / 60) + ":" + String(Math.floor(audio.duration % 60)).padStart(2, '0');
   };
 
   audio.onended = nextTrack;
