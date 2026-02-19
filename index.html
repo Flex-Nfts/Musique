@@ -3,88 +3,232 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SoundVault Cloud Fix</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <title>Mon Spotify Cloud Privé</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
-        body { background: #121212; color: white; font-family: 'Nunito', sans-serif; padding: 20px; }
-        .box { background: #181818; padding: 20px; border-radius: 10px; border: 1px solid #333; }
-        textarea { width: 100%; height: 100px; background: #282828; color: white; border: 1px solid #spotify-green; padding: 10px; margin: 10px 0; border-radius: 5px; }
-        button { background: #1DB954; color: black; border: none; padding: 15px 30px; border-radius: 30px; font-weight: bold; cursor: pointer; }
-        .track { background: #282828; padding: 10px; margin-top: 5px; border-radius: 5px; display: flex; justify-content: space-between; }
-        .play-btn { background: white; color: black; border-radius: 50%; width: 40px; height: 40px; border: none; cursor: pointer; }
+        :root { --bg: #000; --sidebar: #121212; --green: #1DB954; --text: #fff; --text-dim: #b3b3b3; }
+        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); overflow: hidden; }
+        
+        .shell { display: grid; grid-template-columns: 300px 1fr; height: 100vh; }
+
+        /* SIDEBAR */
+        .sidebar { background: var(--sidebar); padding: 20px; display: flex; flex-direction: column; border-right: 1px solid #282828; }
+        .nav-item { padding: 10px; cursor: pointer; font-weight: bold; color: var(--text-dim); border-radius: 5px; margin-bottom: 5px; }
+        .nav-item:hover, .nav-item.active { color: var(--text); background: #282828; }
+        .playlist-list { flex: 1; overflow-y: auto; margin-top: 20px; }
+
+        /* MAIN */
+        .main { padding: 30px; overflow-y: auto; background: linear-gradient(180deg, #222 0%, #121212 100%); }
+        .import-box { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+        textarea { width: 100%; height: 60px; background: #282828; color: #fff; border: 1px solid #333; border-radius: 5px; padding: 10px; box-sizing: border-box; }
+        
+        /* TRACKS */
+        .track-row { display: grid; grid-template-columns: 40px 1fr 1fr 100px; padding: 10px; border-radius: 5px; align-items: center; cursor: pointer; }
+        .track-row:hover { background: rgba(255,255,255,0.1); }
+        .btn-heart { background: none; border: none; color: var(--text-dim); cursor: pointer; font-size: 18px; }
+        .btn-heart.active { color: #e91e63; }
+
+        /* PLAYER BAR (BOTTOM) */
+        .player-bar { position: absolute; bottom: 0; width: 100%; background: #181818; height: 90px; border-top: 1px solid #282828; display: flex; align-items: center; padding: 0 20px; box-sizing: border-box; z-index: 100; }
+        .now-playing { width: 30%; }
+        .controls { width: 40%; display: flex; flex-direction: column; align-items: center; }
+        .volume { width: 30%; display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+        
+        .main-btns { display: flex; align-items: center; gap: 20px; font-size: 20px; }
+        .btn-circle { width: 35px; height: 35px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .play-btn { background: #fff; color: #000; width: 40px; height: 40px; }
+        
+        .progress-container { width: 100%; max-width: 400px; display: flex; align-items: center; gap: 10px; margin-top: 10px; font-size: 12px; color: var(--text-dim); }
+        .slider { flex: 1; height: 4px; background: #4f4f4f; border-radius: 2px; position: relative; cursor: pointer; }
+        .slider-fill { height: 100%; background: var(--green); border-radius: 2px; width: 0%; }
+        input[type=range] { cursor: pointer; }
+
+        .btn-add { background: var(--green); color: #000; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .delete-pl { font-size: 12px; color: #ff4444; cursor: pointer; margin-left: 10px; }
     </style>
 </head>
 <body>
 
-    <div class="box">
-        <h1>Mon Spotify Privé</h1>
-        <p>Colle ta liste ici (Format : Nom | Artiste | Lien)</p>
-        <textarea id="bulkInput" placeholder="Exemple : Rai 01 | Suno | https://www.dropbox.com/s/xyz/01.mp3?dl=0"></textarea>
-        <br>
-        <button onclick="ajouterMusique()">🚀 IMPORTER MA LISTE</button>
+<div class="shell">
+    <div class="sidebar">
+        <div class="nav-item active" onclick="showPl('Toutes')">🏠 Bibliothèque</div>
+        <div class="nav-item" onclick="showPl('Favoris')">❤️ Favoris</div>
+        <hr style="width:100%; border:0.5px solid #282828; margin: 15px 0;">
+        <div style="display:flex; justify-content: space-between; align-items: center;">
+            <span style="font-size:12px; color:var(--text-dim)">PLAYLISTS</span>
+            <button onclick="createPlaylist()" style="background:none; border:none; color:white; cursor:pointer; font-size:18px;">+</button>
+        </div>
+        <div class="playlist-list" id="plList"></div>
     </div>
 
-    <div id="liste" style="margin-top:20px;"></div>
+    <div class="main">
+        <h1 id="plTitle">Ma Bibliothèque</h1>
+        
+        <div class="import-box">
+            <label style="font-size:13px; color:var(--text-dim)">Importer : Nom | Artiste | Lien Dropbox</label>
+            <textarea id="bulkInput" placeholder="Ex: Rai 01 | Suno | https://www.dropbox.com/s/xyz/01.mp3?dl=0"></textarea>
+            <button class="btn-add" onclick="importTracks()">🚀 Importer</button>
+        </div>
 
-    <script>
-        let maListe = JSON.parse(localStorage.getItem('maMusique')) || [];
+        <div id="trackList"></div>
+    </div>
+</div>
 
-        function ajouterMusique() {
-            const texte = document.getElementById('bulkInput').value;
-            const lignes = texte.split('\n');
-            let ajouts = 0;
+<div class="player-bar">
+    <div class="now-playing">
+        <div id="trackTitle" style="font-weight:bold; font-size:14px;">—</div>
+        <div id="trackArtist" style="font-size:12px; color:var(--text-dim);">Sélectionnez un titre</div>
+    </div>
 
-            lignes.forEach(ligne => {
-                if(ligne.includes('|')) {
-                    let infos = ligne.split('|');
-                    let titre = infos[0].trim();
-                    let artiste = infos[1].trim();
-                    let url = infos[2] ? infos[2].trim() : "";
+    <div class="controls">
+        <div class="main-btns">
+            <span style="cursor:pointer" onclick="prev()">⏮</span>
+            <button class="btn-circle play-btn" onclick="togglePlay()" id="playBtn">▶</button>
+            <span style="cursor:pointer" onclick="next()">⏭</span>
+        </div>
+        <div class="progress-container">
+            <span id="curTime">0:00</span>
+            <div class="slider" onclick="seek(event)"><div class="slider-fill" id="progFill"></div></div>
+            <span id="durTime">0:00</span>
+        </div>
+    </div>
 
-                    if(url.includes('http')) {
-                        // On transforme le lien Dropbox automatiquement
-                        url = url.replace('?dl=0', '?raw=1');
-                        maListe.push({ titre, artiste, url });
-                        ajouts++;
-                    } else {
-                        alert("Erreur : Le lien pour '" + titre + "' n'est pas une adresse web (URL)");
-                    }
+    <div class="volume">
+        <span>🔈</span>
+        <input type="range" id="volSlider" min="0" max="100" value="80" oninput="setVol(this.value)" style="width:100px;">
+    </div>
+</div>
+
+<script>
+    let vault = JSON.parse(localStorage.getItem('spotify_vault')) || {
+        tracks: [],
+        playlists: { "Favoris": [] },
+        activePl: "Toutes"
+    };
+
+    let audio = new Audio();
+    let isPlaying = false;
+    let currentIdx = -1;
+
+    function save() { localStorage.setItem('spotify_vault', JSON.stringify(vault)); }
+
+    function importTracks() {
+        const text = document.getElementById('bulkInput').value;
+        const lines = text.split('\n');
+        let added = 0;
+
+        lines.forEach(line => {
+            if(line.includes('|')) {
+                let [t, a, u] = line.split('|').map(s => s.trim());
+                if(u && u.includes('http')) {
+                    u = u.replace('dl=0', 'raw=1');
+                    vault.tracks.push({ id: Date.now() + added, t, a, u, fav: false });
+                    added++;
                 }
-            });
-
-            if(ajouts > 0) {
-                localStorage.setItem('maMusique', JSON.stringify(maListe));
-                alert(ajouts + " musique(s) ajoutée(s) !");
-                afficher();
-            } else {
-                alert("Rien n'a été ajouté. Vérifie que tu as bien mis le signe | entre le nom et le lien.");
             }
+        });
+        if(added > 0) { save(); renderTracks(); document.getElementById('bulkInput').value = ""; alert(added + " titres ajoutés !"); }
+    }
+
+    function renderTracks() {
+        const container = document.getElementById('trackList');
+        const title = document.getElementById('plTitle');
+        title.innerText = vault.activePl;
+        
+        let list = vault.tracks;
+        if(vault.activePl === "Favoris") list = vault.tracks.filter(t => t.fav);
+        else if(vault.activePl !== "Toutes") {
+            const trackIds = vault.playlists[vault.activePl] || [];
+            list = vault.tracks.filter(t => trackIds.includes(t.id));
         }
 
-        function afficher() {
-            const div = document.getElementById('liste');
-            div.innerHTML = maListe.map((m, i) => `
-                <div class="track">
-                    <span><strong>${m.titre}</strong> - ${m.artiste}</span>
-                    <button class="play-btn" onclick="jouer('${m.url}')">▶</button>
-                    <button onclick="supprimer(${i})" style="background:none; color:red; border:none; cursor:pointer;">X</button>
+        container.innerHTML = list.map((t, i) => `
+            <div class="track-row">
+                <span onclick="playTrack(${vault.tracks.indexOf(t)})">${i+1}</span>
+                <span onclick="playTrack(${vault.tracks.indexOf(t)})"><b>${t.t}</b></span>
+                <span style="color:var(--text-dim)">${t.a}</span>
+                <div>
+                    <button class="btn-heart ${t.fav?'active':''}" onclick="toggleFav(${t.id})">❤</button>
+                    <button onclick="deleteTrack(${t.id})" style="background:none; border:none; color:red; cursor:pointer;">🗑</button>
                 </div>
-            `).join('');
-        }
+            </div>
+        `).join('');
+        renderSidebar();
+    }
 
-        let audio = new Audio();
-        function jouer(url) {
-            audio.src = url;
-            audio.play();
-        }
+    function renderSidebar() {
+        const list = document.getElementById('plList');
+        list.innerHTML = Object.keys(vault.playlists).map(p => `
+            <div class="nav-item ${vault.activePl === p ? 'active' : ''}" style="display:flex; justify-content:space-between">
+                <span onclick="showPl('${p}')">${p === "Favoris" ? '❤️ Favoris' : '📁 '+p}</span>
+                ${p !== "Favoris" ? `<span class="delete-pl" onclick="deletePl('${p}')">✕</span>` : ''}
+            </div>
+        `).join('');
+    }
 
-        function supprimer(i) {
-            maListe.splice(i, 1);
-            localStorage.setItem('maMusique', JSON.stringify(maListe));
-            afficher();
-        }
+    function createPlaylist() {
+        const name = prompt("Nom de la playlist ?");
+        if(name && !vault.playlists[name]) { vault.playlists[name] = []; save(); renderSidebar(); }
+    }
 
-        afficher();
-    </script>
+    function deletePl(name) { if(confirm("Supprimer la playlist ?")) { delete vault.playlists[name]; vault.activePl="Toutes"; save(); renderTracks(); } }
+
+    function showPl(p) { vault.activePl = p; renderTracks(); }
+
+    function toggleFav(id) {
+        const t = vault.tracks.find(x => x.id === id);
+        t.fav = !t.fav; save(); renderTracks();
+    }
+
+    function playTrack(idx) {
+        currentIdx = idx;
+        const t = vault.tracks[idx];
+        document.getElementById('trackTitle').innerText = t.t;
+        document.getElementById('trackArtist').innerText = t.a;
+        audio.src = t.u;
+        audio.play();
+        isPlaying = true;
+        document.getElementById('playBtn').innerText = '⏸';
+    }
+
+    function togglePlay() {
+        if(!audio.src && vault.tracks.length > 0) return playTrack(0);
+        if(isPlaying) { audio.pause(); document.getElementById('playBtn').innerText = '▶'; }
+        else { audio.play(); document.getElementById('playBtn').innerText = '⏸'; }
+        isPlaying = !isPlaying;
+    }
+
+    function next() { if(currentIdx < vault.tracks.length - 1) playTrack(currentIdx + 1); }
+    function prev() { if(currentIdx > 0) playTrack(currentIdx - 1); }
+    function setVol(v) { audio.volume = v / 100; }
+
+    function deleteTrack(id) {
+        vault.tracks = vault.tracks.filter(t => t.id !== id);
+        save(); renderTracks();
+    }
+
+    audio.ontimeupdate = () => {
+        if(audio.duration) {
+            const pct = (audio.currentTime / audio.duration) * 100;
+            document.getElementById('progFill').style.width = pct + '%';
+            document.getElementById('curTime').innerText = formatTime(audio.currentTime);
+            document.getElementById('durTime').innerText = formatTime(audio.duration);
+        }
+    };
+
+    function formatTime(s) {
+        let min = Math.floor(s / 60);
+        let sec = Math.floor(s % 60);
+        return min + ":" + (sec < 10 ? "0" + sec : sec);
+    }
+
+    function seek(e) {
+        const pct = e.offsetX / e.target.offsetWidth;
+        audio.currentTime = pct * audio.duration;
+    }
+
+    renderTracks();
+</script>
+
 </body>
 </html>
